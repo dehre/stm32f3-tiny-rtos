@@ -1,0 +1,14 @@
+.mxproject
+*.launch
+.settings/*
+
+build/*
+Debug/*
+Release/*
+
+.vscode/*
+!.vscode/c_cpp_properties.json
+!.vscode/cmake-kits.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
