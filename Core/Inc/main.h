@@ -1,40 +1,15 @@
-/**
- ******************************************************************************
- * @file           : main.h
- * @brief          : Header for main.c file.
- *                   This file contains the common defines of the application.
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2022 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
+/*
+ * This module provides the main program body and the common defines of the application.
  */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#pragma once
 
-/* Includes ------------------------------------------------------------------*/
 #include "stm32f3xx_hal.h"
 
-/* Private includes ----------------------------------------------------------*/
-
-/* Exported types ------------------------------------------------------------*/
-
-/* Exported constants --------------------------------------------------------*/
-
-/* Exported macro ------------------------------------------------------------*/
-
-/* Exported functions prototypes ---------------------------------------------*/
+int main(void);
 void Error_Handler(void);
 
-/* Private defines -----------------------------------------------------------*/
+// TODO LORIS: clean up unused #defines
 #define DRDY_Pin GPIO_PIN_2
 #define DRDY_GPIO_Port GPIOE
 #define CS_I2C_SPI_Pin GPIO_PIN_3
@@ -93,5 +68,3 @@ void Error_Handler(void);
 #define MEMS_INT1_GPIO_Port GPIOE
 #define MEMS_INT2_Pin GPIO_PIN_1
 #define MEMS_INT2_GPIO_Port GPIOE
-
-#endif /* __MAIN_H */

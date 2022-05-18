@@ -1,42 +1,14 @@
-/**
- ******************************************************************************
- * @file    stm32f3xx_it.c
- * @brief   Interrupt Service Routines.
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2022 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
+//==================================================================================================
+// INCLUDES
+//==================================================================================================
 
-/* Includes ------------------------------------------------------------------*/
 #include "stm32f3xx_it.h"
 #include "main.h"
-/* Private includes ----------------------------------------------------------*/
 
-/* Private typedef -----------------------------------------------------------*/
+//==================================================================================================
+// CORTEX-M4 PROCESSOR INTERRUPTION AND EXCEPTION HANDLERS
+//==================================================================================================
 
-/* Private define ------------------------------------------------------------*/
-
-/* Private macro -------------------------------------------------------------*/
-
-/* Private variables ---------------------------------------------------------*/
-
-/* Private function prototypes -----------------------------------------------*/
-
-/* Private user code ---------------------------------------------------------*/
-
-/* External variables --------------------------------------------------------*/
-
-/******************************************************************************/
-/*           Cortex-M4 Processor Interruption and Exception Handlers          */
-/******************************************************************************/
 /**
  * @brief This function handles Non maskable interrupt.
  */
@@ -122,9 +94,8 @@ void SysTick_Handler(void)
     HAL_IncTick();
 }
 
-/******************************************************************************/
-/* STM32F3xx Peripheral Interrupt Handlers                                    */
-/* Add here the Interrupt Handlers for the used peripherals.                  */
-/* For the available peripheral interrupt handler names,                      */
-/* please refer to the startup file (startup_stm32f3xx.s).                    */
-/******************************************************************************/
+//==================================================================================================
+// STM32F3xx PERIPHERAL INTERRUPT HANDLERS
+// For the available peripheral interrupt handler names,
+// please refer to the startup file (startup_stm32f3xx.s).
+//==================================================================================================

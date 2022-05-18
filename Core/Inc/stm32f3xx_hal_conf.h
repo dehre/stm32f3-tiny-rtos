@@ -1,31 +1,14 @@
-/**
- ******************************************************************************
- * @file    stm32f3xx_hal_conf.h
- * @brief   HAL configuration file.
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2016 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
+/*
+ * This module initializes the global MSP and configures the HAL.
  */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F3xx_HAL_CONF_H
-#define __STM32F3xx_HAL_CONF_H
+#pragma once
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
+void HAL_MspInit(void);
 
-/* ########################## Module Selection ############################## */
-/**
- * @brief This is the list of modules to be used in the HAL driver
- */
+//==================================================================================================
+// MODULE SELECTION
+//==================================================================================================
 
 #define HAL_MODULE_ENABLED
 /*#define HAL_ADC_MODULE_ENABLED   */
@@ -68,7 +51,14 @@
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
 #define HAL_I2C_MODULE_ENABLED
-/* ########################## HSE/HSI Values adaptation ##################### */
+
+//==================================================================================================
+// HSE/HSI VALUES ADAPTATION
+//==================================================================================================
+
+/* Tip: To avoid modifying this file each time you need to use different HSE,
+   ===  you can define the HSE value in your toolchain compiler preprocessor. */
+
 /**
  * @brief Adjust the value of External High Speed oscillator (HSE) used in your application.
  *        This value is used by the RCC HAL module to compute the system frequency
@@ -107,10 +97,12 @@
  * @brief Internal Low Speed oscillator (LSI) value.
  */
 #if !defined(LSI_VALUE)
-#define LSI_VALUE ((uint32_t)40000)
-#endif /* LSI_VALUE */ /*!< Value of the Internal Low Speed oscillator in Hz                                           \
-                        The real value may vary depending on the variations                                            \
-                        in voltage and temperature.  */
+#define LSI_VALUE                                                                                                      \
+    ((uint32_t)40000) /*!< Value of the Internal Low Speed oscillator in Hz                                            \
+                           The real value may vary depending on the variations                                         \
+                           in voltage and temperature.  */
+#endif                /* LSI_VALUE */
+
 /**
  * @brief External Low Speed oscillator (LSE) value.
  */
@@ -136,13 +128,9 @@
 #define EXTERNAL_CLOCK_VALUE ((uint32_t)8000000) /*!< Value of the External oscillator in Hz*/
 #endif                                           /* EXTERNAL_CLOCK_VALUE */
 
-/* Tip: To avoid modifying this file each time you need to use different HSE,
-   ===  you can define the HSE value in your toolchain compiler preprocessor. */
-
-/* ########################### System Configuration ######################### */
-/**
- * @brief This is the HAL system configuration section
- */
+//==================================================================================================
+// SYSTEM CONFIGURATION
+//==================================================================================================
 
 #define VDD_VALUE ((uint32_t)3300)      /*!< Value of VDD in mv */
 #define TICK_INT_PRIORITY ((uint32_t)0) /*!< tick interrupt priority (lowest by default)  */
@@ -177,17 +165,9 @@
 #define USE_HAL_TSC_REGISTER_CALLBACKS 0U       /* TSC register callback disabled       */
 #define USE_HAL_PCD_REGISTER_CALLBACKS 0U       /* PCD register callback disabled       */
 
-/* ########################## Assert Selection ############################## */
-/**
- * @brief Uncomment the line below to expanse the "assert_param" macro in the
- *        HAL drivers code
- */
-/* #define USE_FULL_ASSERT    1U */
-
-/* Includes ------------------------------------------------------------------*/
-/**
- * @brief Include module's header file
- */
+//==================================================================================================
+// ASSERT SELECTION
+//==================================================================================================
 
 #ifdef HAL_RCC_MODULE_ENABLED
 #include "stm32f3xx_hal_rcc.h"
@@ -329,7 +309,12 @@
 #include "stm32f3xx_hal_wwdg.h"
 #endif /* HAL_WWDG_MODULE_ENABLED */
 
-/* Exported macro ------------------------------------------------------------*/
+/**
+ * @brief Uncomment the line below to expanse the "assert_param" macro in the
+ *        HAL drivers code
+ */
+/* #define USE_FULL_ASSERT    1U */
+
 #ifdef USE_FULL_ASSERT
 /**
  * @brief  The assert_param macro is used for function's parameters check.
@@ -340,10 +325,7 @@
  * @retval None
  */
 #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
-/* Exported functions ------------------------------------------------------- */
 void assert_failed(uint8_t *file, uint32_t line);
 #else
 #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
-
-#endif /* __STM32F3xx_HAL_CONF_H */
