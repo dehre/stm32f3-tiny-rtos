@@ -1,0 +1,27 @@
+{
+    "version": 4,
+    "configurations": [
+        {
+            /* ms-vscode.cmake-tools plugin sometimes doesn't work well */
+            "name": "STM32 Workaround",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.macos64_2.0.0.202105311346/tools/lib/gcc/arm-none-eabi/9.3.1/include"
+            ],
+            "defines": ["STM32F303xC"]
+        },
+        {
+            /* ms-vscode.cmake-tools plugin shall to be installed, which provides include paths and defines through CMake file */
+            "name": "STM32",
+            "includePath": [],
+            "defines": [],
+            "compilerPath": "",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "${default}",
+
+            /* Use this and all the include paths will come from CMake configuration instead */
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ]
+}

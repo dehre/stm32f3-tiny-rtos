@@ -41,6 +41,8 @@ int main(void)
     /* Infinite loop */
     while (1)
     {
+        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_14);
+        HAL_Delay(1000);
     }
 }
 
