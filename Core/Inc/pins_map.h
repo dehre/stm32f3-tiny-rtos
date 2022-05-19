@@ -1,13 +1,8 @@
 /*
- * This module provides the main program body and the common defines of the application.
+ * This module provides the common defines of the application.
  */
 
 #pragma once
-
-#include "stm32f3xx_hal.h"
-
-int main(void);
-void Error_Handler(void);
 
 // TODO LORIS: clean up unused #defines
 #define DRDY_Pin GPIO_PIN_2
