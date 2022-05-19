@@ -4,6 +4,8 @@
 
 #include "stm32f3xx_it.h"
 
+#include "os_timer.h"
+
 #include "stm32f3xx_hal.h"
 
 //==================================================================================================
@@ -67,3 +69,9 @@ void SysTick_Handler(void)
 // For the available peripheral interrupt handler names,
 // please refer to the startup file (startup_stm32f3xx.s).
 //==================================================================================================
+
+void OSTimer_IRQHandler(void)
+{
+    OSTimer_ClearITFlag();
+    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+}

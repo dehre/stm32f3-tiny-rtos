@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "os_timer.h"
+
 //==================================================================================================
 // CORTEX-M4 PROCESSOR INTERRUPTION AND EXCEPTION HANDLERS
 //==================================================================================================
@@ -58,3 +60,8 @@ void SysTick_Handler(void);
 // For the available peripheral interrupt handler names,
 // please refer to the startup file (startup_stm32f3xx.s).
 //==================================================================================================
+
+/**
+ * @brief This function handles interrupts for the OS Timer
+ */
+void OSTimer_IRQHandler(void);

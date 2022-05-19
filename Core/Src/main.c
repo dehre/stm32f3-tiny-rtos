@@ -2,6 +2,7 @@
 // INCLUDES
 //==================================================================================================
 
+#include "os_timer.h"
 #include "pins_map.h"
 
 #include "stm32f3xx_hal.h"
@@ -39,6 +40,9 @@ int main(void)
 
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
+
+    OSTimer_Init();
+    OSTimer_Start();
 
     /* Infinite loop */
     while (1)
