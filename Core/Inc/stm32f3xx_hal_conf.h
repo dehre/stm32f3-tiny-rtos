@@ -1,5 +1,5 @@
 /*
- * This module initializes the global MSP and configures the HAL.
+ * HAL configuration file.
  */
 
 #pragma once
