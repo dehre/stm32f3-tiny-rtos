@@ -38,12 +38,13 @@ set(EXECUTABLE                      ${CMAKE_PROJECT_NAME})
 # Source files
 #
 set(src_core_src_SRCS 
+    ${PROJ_PATH}/Core/Src/main.c
     ${PROJ_PATH}/Core/Src/stm32f3xx_it.c
     ${PROJ_PATH}/Core/Src/stm32f3xx_hal_msp.c
     ${PROJ_PATH}/Core/Src/syscalls.c
     ${PROJ_PATH}/Core/Src/system_stm32f3xx.c
-    ${PROJ_PATH}/Core/Src/main.c
-    ${PROJ_PATH}/Core/Src/sysmem.c)
+    ${PROJ_PATH}/Core/Src/sysmem.c
+    ${PROJ_PATH}/Core/Src/user_tasks.c)
 
 set(src_core_startup_SRCS 
     ${PROJ_PATH}/Core/Startup/startup_stm32f303vctx.s)
