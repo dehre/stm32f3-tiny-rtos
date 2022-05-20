@@ -2,6 +2,7 @@
 // INCLUDES
 //==================================================================================================
 
+#include "iferr.h"
 #include "os.h"
 #include "pins_map.h"
 #include "user_tasks.h"
@@ -12,6 +13,21 @@
 // DEFINES - MACROS
 //==================================================================================================
 
+// TODO LORIS: maybe move Error_Handler as part of iferr.h,
+//   and create macro IFERR_HALT;
+// or use assert_failed from hal_conf.h, and get rid of Error_Handler completely: how would it behave
+//   in case of errors?
+static void Error_Handler(void);
+
+#define CHECK(x)                                                                                                       \
+    {                                                                                                                  \
+        HAL_StatusTypeDef err = (x);                                                                                   \
+        if (err != HAL_OK)                                                                                             \
+        {                                                                                                              \
+            Error_Handler();                                                                                           \
+        }                                                                                                              \
+    }
+
 //==================================================================================================
 // ENUMS - STRUCTS - TYPEDEFS
 //==================================================================================================
@@ -20,7 +36,7 @@
 // STATIC PROTOTYPES
 //==================================================================================================
 
-static void SystemClock_Config(void);
+static HAL_StatusTypeDef SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 
 //==================================================================================================
@@ -34,31 +50,23 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-    HAL_Init();
+    CHECK(HAL_Init());
 
     /* Configure the system clock */
-    SystemClock_Config();
+    CHECK(SystemClock_Config());
 
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
 
     OS_AddThreads(UserTask_0, UserTask_1, UserTask_2);
-    OS_Init(10);
-    OS_Launch();
+    CHECK(OS_Init(10));
+    CHECK(OS_Launch());
 
     /* Infinite loop */
     while (1)
     {
         HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_14);
         HAL_Delay(1000);
-    }
-}
-
-void Error_Handler(void)
-{
-    __disable_irq();
-    while (1)
-    {
     }
 }
 
@@ -72,7 +80,15 @@ void assert_failed(uint8_t *file, uint32_t line)
 // STATIC FUNCTIONS
 //==================================================================================================
 
-static void SystemClock_Config(void)
+static void Error_Handler(void)
+{
+    __disable_irq();
+    while (1)
+    {
+    }
+}
+
+static HAL_StatusTypeDef SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -86,10 +102,7 @@ static void SystemClock_Config(void)
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
     RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
-        Error_Handler();
-    }
+    IFERR_RETE(HAL_RCC_OscConfig(&RCC_OscInitStruct))
 
     /** Initializes the CPU, AHB and APB buses clocks
      */
@@ -98,11 +111,9 @@ static void SystemClock_Config(void)
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    IFERR_RETE(HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1));
 
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
-    {
-        Error_Handler();
-    }
+    return HAL_OK;
 }
 
 static void MX_GPIO_Init(void)

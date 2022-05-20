@@ -4,6 +4,7 @@
 
 #include "os.h"
 
+#include "iferr.h"
 #include "os_timer.h"
 
 //==================================================================================================
@@ -50,13 +51,13 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
 // The fn OS_Init sets the clock?, then initializes OS_Timer and Sleep_Timer.
 // TODO LORIS: rephrase
 //
-void OS_Init(uint32_t schedulerFrequencyHz);
+HAL_StatusTypeDef OS_Init(uint32_t schedulerFrequencyHz);
 
 //
 // The fn OS_Launch enables OS_Timer and Sleep_Timer, then calls OSAsm_Start,
 //   which starts the first thread.
 //
-void OS_Launch(void);
+HAL_StatusTypeDef OS_Launch(void);
 
 //
 // The fn OSAsm_Start, defined in os-asm.s, is called by OS_Launch once.
@@ -137,19 +138,21 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
     RunPt = &(TCBs[0]); // thread 0 will run first
 }
 
-void OS_Init(uint32_t schedulerFrequencyHz)
+HAL_StatusTypeDef OS_Init(uint32_t schedulerFrequencyHz)
 {
     // TODO LORIS: setup clock as part of OS_Init ?
 
     // TODO LORIS: param to adjust frequency
     // TODO LORIS: should the interrupt handler be passed as arg to Timer_Init? as for blinky
-    OSTimer_Init();
+    return OSTimer_Init();
 }
 
-void OS_Launch(void)
+HAL_StatusTypeDef OS_Launch(void)
 {
     // TODO LORIS: do I really need to disable irq here?
     __disable_irq(); // prevent the timer's ISR from firing before OSAsm_Start is called
-    OSTimer_Start();
+    // TODO LORIS: this fn won't return, so if an error happens, just crash
+    IFERR_RETE(OSTimer_Start());
     OSAsm_Start();
+    return HAL_OK;
 }

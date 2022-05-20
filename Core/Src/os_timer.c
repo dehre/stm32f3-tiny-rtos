@@ -22,14 +22,6 @@
 // STATIC VARIABLES
 //==================================================================================================
 
-// TODO LORIS: centralize the error handler in main.c
-static void Error_Handler(void)
-{
-    while (1)
-    {
-    }
-}
-
 //==================================================================================================
 // GLOBAL FUNCTIONS
 //==================================================================================================
@@ -37,7 +29,7 @@ static void Error_Handler(void)
 TIM_HandleTypeDef OSTimer_Handle;
 
 // TODO LORIS: adjust values
-void OSTimer_Init(void)
+HAL_StatusTypeDef OSTimer_Init(void)
 {
     /* Compute the prescaler value to have TIM2 counter clock equal to 10 KHz */
     uint32_t uwPrescalerValue = (SystemCoreClock / 10000) - 1;
@@ -47,18 +39,12 @@ void OSTimer_Init(void)
     OSTimer_Handle.Init.ClockDivision = 0;
     OSTimer_Handle.Init.CounterMode = TIM_COUNTERMODE_DOWN;
     OSTimer_Handle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    if (HAL_TIM_Base_Init(&OSTimer_Handle) != HAL_OK)
-    {
-        Error_Handler();
-    }
+    return HAL_TIM_Base_Init(&OSTimer_Handle);
 }
 
-void OSTimer_Start(void)
+HAL_StatusTypeDef OSTimer_Start(void)
 {
-    if (HAL_TIM_Base_Start_IT(&OSTimer_Handle) != HAL_OK)
-    {
-        Error_Handler();
-    }
+    return HAL_TIM_Base_Start_IT(&OSTimer_Handle);
 }
 
 void OSTimer_ClearITFlag(void)
