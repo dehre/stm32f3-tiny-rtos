@@ -12,7 +12,6 @@
 // TODO LORIS: set preempt priority to low, so that it doesn't interrupt other important ISRs
 #define OSTimer_IRQPreemptPriority 4
 #define OSTimer_IRQSubPriority 0
-#define OSTimer_IRQHandler TIM2_IRQHandler
 
 extern TIM_HandleTypeDef OSTimer_Handle;
 

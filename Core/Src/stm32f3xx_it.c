@@ -21,6 +21,12 @@ void NMI_Handler(void)
 
 void HardFault_Handler(void)
 {
+    // TODO LORIS: use global vars to quickly check which bit is set
+    // GDB Debugging, from https://interrupt.memfault.com/blog/cortex-m-fault-debug
+    // Entire CFSR - print/x *(uint32_t *) 0xE000ED28
+    // UsageFault Status Register (UFSR) - print/x *(uint16_t *)0xE000ED2A
+    // BusFault Status Register (BFSR) - print/x *(uint8_t *)0xE000ED29
+    // MemManage Status Register (MMFSR) - print/x *(uint8_t *)0xE000ED28
     while (1)
     {
     }
@@ -69,9 +75,3 @@ void SysTick_Handler(void)
 // For the available peripheral interrupt handler names,
 // please refer to the startup file (startup_stm32f3xx.s).
 //==================================================================================================
-
-void OSTimer_IRQHandler(void)
-{
-    OSTimer_ClearITFlag();
-    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_8);
-}

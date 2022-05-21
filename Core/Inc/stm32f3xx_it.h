@@ -62,6 +62,6 @@ void SysTick_Handler(void);
 //==================================================================================================
 
 /**
- * @brief This function handles interrupts for the OS Timer
+ * @brief This function handles interrupts for the OSTimer and is defined in os_asm.s 
  */
-void OSTimer_IRQHandler(void);
+void TIM2_IRQHandler(void);

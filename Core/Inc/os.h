@@ -12,3 +12,5 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
 HAL_StatusTypeDef OS_Init(uint32_t schedulerFrequencyHz);
 
 HAL_StatusTypeDef OS_Launch(void);
+
+void OS_Scheduler(void);

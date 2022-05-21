@@ -60,16 +60,16 @@ HAL_StatusTypeDef OS_Init(uint32_t schedulerFrequencyHz);
 HAL_StatusTypeDef OS_Launch(void);
 
 //
-// The fn OSAsm_Start, defined in os-asm.s, is called by OS_Launch once.
+// The fn OSAsm_Start, defined in os_asm.s, is called by OS_Launch once.
 // It "restores" the first thread's stack on the main stack.
 //
 extern void OSAsm_Start(void);
 
 //
-// The fn OSAsm_ThreadSwitch, defined in os-asm.s, is periodically called by OS_Timer (ISR).
+// The fn OSAsm_ThreadSwitch, defined in os_asm.s, is periodically called by OS_Timer (ISR).
 // It preemptively switches to the next thread, that is, it stores the stack of the running
 //   thread and restores the stack of the next thread.
-// It calls OS_Schedule to decide which thread is run next and update `RunPt`.
+// It calls OS_Schedule to decide which thread is run next and update RunPt.
 //
 extern void OSAsm_ThreadSwitch(void);
 
@@ -89,7 +89,7 @@ void OS_Suspend(void);
 // The fn OS_Sleep makes the current thread dormant for a specified time.
 // It's called by the running thread itself.
 // The fn OS_DecrementTCBsSleepValue is called by Sleep_Timer every ms and decrements the
-//   the value of `sleep` on the thread-control-blocks.
+//   the value of sleep on the thread-control-blocks.
 //
 void OS_Sleep(uint32_t ms);
 static void OS_DecrementTCBsSleepValue(void);
@@ -102,7 +102,7 @@ static void OS_SetInitialStack(uint32_t i)
 {
     // From "STM32 Cortex-M4 Programming Manual" page 23: attempting to execute instructions when
     //   the T bit is 0 results in a fault or lockup.
-    Stacks[i][STACKSIZE - 1] = 0x01000000; // thumb bit (PSR)
+    Stacks[i][STACKSIZE - 1] = 0x01000000; // Thumb Bit (PSR)
     // Stacks[i][STACKSIZE - 2] =           // R15 (PC) -> set later in fn OS_AddThreads
     Stacks[i][STACKSIZE - 3] = 0x14141414;  // R14 (LR)
     Stacks[i][STACKSIZE - 4] = 0x12121212;  // R12
@@ -155,4 +155,9 @@ HAL_StatusTypeDef OS_Launch(void)
     IFERR_RETE(OSTimer_Start());
     OSAsm_Start();
     return HAL_OK;
+}
+
+void OS_Scheduler(void)
+{
+    RunPt = RunPt->next;
 }

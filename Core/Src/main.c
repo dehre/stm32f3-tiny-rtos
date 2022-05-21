@@ -8,6 +8,7 @@
 #include "user_tasks.h"
 
 #include "stm32f3xx_hal.h"
+#include <assert.h>
 
 //==================================================================================================
 // DEFINES - MACROS
@@ -62,12 +63,8 @@ int main(void)
     CHECK(OS_Init(10));
     CHECK(OS_Launch());
 
-    /* Infinite loop */
-    while (1)
-    {
-        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_14);
-        HAL_Delay(1000);
-    }
+    /* This statement should not be reached */
+    assert(0);
 }
 
 #ifdef USE_FULL_ASSERT
