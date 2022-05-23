@@ -18,7 +18,7 @@
 
 #include "stm32f3xx_hal.h"
 
-// TODO LORIS: iferr_hang turns on onboard red led in both debug and release;
+// TODO LORIS: IFERR_BKPT turns on onboard red led in both debug and release;
 //    it needs iferr_init() to be called, which initializes gpio pin.
 
 /*
@@ -38,7 +38,7 @@
  * If error, hang there
  */
 #ifdef DEBUG
-#define IFERR_HANG(x)                                                                                                  \
+#define IFERR_BKPT(x)                                                                                                  \
     do                                                                                                                 \
     {                                                                                                                  \
         HAL_StatusTypeDef err = (x);                                                                                   \
@@ -48,7 +48,7 @@
         }                                                                                                              \
     } while (0)
 #else
-#define IFERR_HANG(x)                                                                                                  \
+#define IFERR_BKPT(x)                                                                                                  \
     do                                                                                                                 \
     {                                                                                                                  \
         HAL_StatusTypeDef err = (x);                                                                                   \
