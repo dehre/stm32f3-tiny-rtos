@@ -90,7 +90,6 @@ set(include_asm_DIRS
 # Symbols definition
 #
 set(symbols_c_SYMB
-    "DEBUG"
     "USE_HAL_DRIVER"
     "STM32F303xC"
 )
@@ -98,7 +97,7 @@ set(symbols_cxx_SYMB
     
 )
 set(symbols_asm_SYMB
-    "DEBUG"
+    
 )
 
 #

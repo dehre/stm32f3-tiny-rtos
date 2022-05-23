@@ -141,9 +141,7 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
 HAL_StatusTypeDef OS_Init(uint32_t schedulerFrequencyHz)
 {
     // TODO LORIS: setup clock as part of OS_Init ?
-
     // TODO LORIS: param to adjust frequency
-    // TODO LORIS: should the interrupt handler be passed as arg to Timer_Init? as for blinky
     return OSTimer_Init();
 }
 
@@ -152,8 +150,13 @@ HAL_StatusTypeDef OS_Launch(void)
     // TODO LORIS: do I really need to disable irq here?
     __disable_irq(); // prevent the timer's ISR from firing before OSAsm_Start is called
     // TODO LORIS: this fn won't return, so if an error happens, just crash
+    // TODO LORIS: use IFERR_HANG
     IFERR_RETE(OSTimer_Start());
     OSAsm_Start();
+
+    /* This statement should not be reached */
+    // TODO LORIS: don't use assert
+    // assert(0);
     return HAL_OK;
 }
 

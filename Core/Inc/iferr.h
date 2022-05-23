@@ -14,21 +14,49 @@
  * ```
  */
 
-// TODO LORIS: use a global variable to store file, fn, and line of error
-//   so crashes will be less anonymous
-
 #pragma once
 
 #include "stm32f3xx_hal.h"
+
+// TODO LORIS: iferr_hang turns on onboard red led in both debug and release;
+//    it needs iferr_init() to be called, which initializes gpio pin.
 
 /*
  * If error, return error
  */
 #define IFERR_RETE(x)                                                                                                  \
+    do                                                                                                                 \
     {                                                                                                                  \
         HAL_StatusTypeDef err = (x);                                                                                   \
         if (err != HAL_OK)                                                                                             \
         {                                                                                                              \
             return err;                                                                                                \
         }                                                                                                              \
-    }
+    } while (0)
+
+/*
+ * If error, hang there
+ */
+#ifdef DEBUG
+#define IFERR_HANG(x)                                                                                                  \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        HAL_StatusTypeDef err = (x);                                                                                   \
+        if (err != HAL_OK)                                                                                             \
+        {                                                                                                              \
+            __asm("BKPT 1");                                                                                           \
+        }                                                                                                              \
+    } while (0)
+#else
+#define IFERR_HANG(x)                                                                                                  \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        HAL_StatusTypeDef err = (x);                                                                                   \
+        if (err != HAL_OK)                                                                                             \
+        {                                                                                                              \
+            while (1)                                                                                                  \
+            {                                                                                                          \
+            }                                                                                                          \
+        }                                                                                                              \
+    } while (0)
+#endif

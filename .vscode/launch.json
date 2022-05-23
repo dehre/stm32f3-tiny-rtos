@@ -17,7 +17,7 @@
             "runToMain": true,
             "svdFile": "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.productdb.debug_2.0.200.202201061234/resources/cmsis/STMicroelectronics_CMSIS_SVD/STM32F303.svd",
             "v1": false,
-            "showDevDebugOutput": "both",
+            "showDevDebugOutput": "none",
 
             /* Will get automatically detected if STM32CubeIDE is installed to default directory
                or it can be manually provided if necessary.. */

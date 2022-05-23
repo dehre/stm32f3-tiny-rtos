@@ -64,6 +64,7 @@ int main(void)
     CHECK(OS_Launch());
 
     /* This statement should not be reached */
+    // TODO LORIS: don't use assert
     assert(0);
 }
 
@@ -99,7 +100,7 @@ static HAL_StatusTypeDef SystemClock_Config(void)
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
     RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
-    IFERR_RETE(HAL_RCC_OscConfig(&RCC_OscInitStruct))
+    IFERR_RETE(HAL_RCC_OscConfig(&RCC_OscInitStruct));
 
     /** Initializes the CPU, AHB and APB buses clocks
      */
