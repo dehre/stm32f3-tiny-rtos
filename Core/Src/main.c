@@ -8,26 +8,10 @@
 #include "user_tasks.h"
 
 #include "stm32f3xx_hal.h"
-#include <assert.h>
 
 //==================================================================================================
 // DEFINES - MACROS
 //==================================================================================================
-
-// TODO LORIS: maybe move Error_Handler as part of iferr.h,
-//   and create macro IFERR_HALT;
-// or use assert_failed from hal_conf.h, and get rid of Error_Handler completely: how would it behave
-//   in case of errors?
-static void Error_Handler(void);
-
-#define CHECK(x)                                                                                                       \
-    {                                                                                                                  \
-        HAL_StatusTypeDef err = (x);                                                                                   \
-        if (err != HAL_OK)                                                                                             \
-        {                                                                                                              \
-            Error_Handler();                                                                                           \
-        }                                                                                                              \
-    }
 
 //==================================================================================================
 // ENUMS - STRUCTS - TYPEDEFS
@@ -48,43 +32,42 @@ static void MX_GPIO_Init(void);
 // GLOBAL FUNCTIONS
 //==================================================================================================
 
+// TODO LORIS: deleteme
+HAL_StatusTypeDef gonna_fail(void)
+{
+    return HAL_ERROR;
+}
+
 int main(void)
 {
-    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-    CHECK(HAL_Init());
+    /* Reset of all peripherals, initialize the Flash interface and the Systick. */
+    IFERR_PANIC(HAL_Init());
 
     /* Configure the system clock */
-    CHECK(SystemClock_Config());
+    IFERR_PANIC(SystemClock_Config());
 
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
 
+    IFERR_PANIC(gonna_fail());
+
     OS_AddThreads(UserTask_0, UserTask_1, UserTask_2);
-    CHECK(OS_Init(10));
-    CHECK(OS_Launch());
+    IFERR_PANIC(OS_Init(10));
+    IFERR_PANIC(OS_Launch());
 
     /* This statement should not be reached */
-    // TODO LORIS: don't use assert
-    assert(0);
+    IfErr_PanicHandler();
 }
 
-#ifdef USE_FULL_ASSERT
-void assert_failed(uint8_t *file, uint32_t line)
+void IfErr_PanicHandler(void)
 {
+    __disable_irq();
+    __asm("BKPT 1");
 }
-#endif /* USE_FULL_ASSERT */
 
 //==================================================================================================
 // STATIC FUNCTIONS
 //==================================================================================================
-
-static void Error_Handler(void)
-{
-    __disable_irq();
-    while (1)
-    {
-    }
-}
 
 static HAL_StatusTypeDef SystemClock_Config(void)
 {

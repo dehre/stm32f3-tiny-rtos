@@ -150,7 +150,7 @@ HAL_StatusTypeDef OS_Launch(void)
     // TODO LORIS: do I really need to disable irq here?
     __disable_irq(); // prevent the timer's ISR from firing before OSAsm_Start is called
     // TODO LORIS: this fn won't return, so if an error happens, just crash
-    // TODO LORIS: use IFERR_BKPT
+    // TODO LORIS: use IFERR_PANIC
     IFERR_RETE(OSTimer_Start());
     OSAsm_Start();
 

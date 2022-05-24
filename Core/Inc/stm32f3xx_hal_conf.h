@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "iferr.h"
+
 void HAL_MspInit(void);
 
 //==================================================================================================
@@ -310,10 +312,10 @@ void HAL_MspInit(void);
 #endif /* HAL_WWDG_MODULE_ENABLED */
 
 /**
- * @brief Uncomment the line below to expanse the "assert_param" macro in the
- *        HAL drivers code
+ * @brief Comment the line below to make the "assert_param" macro a no-op
+ *        in the HAL drivers code
  */
-/* #define USE_FULL_ASSERT    1U */
+#define USE_FULL_ASSERT 1U
 
 #ifdef USE_FULL_ASSERT
 /**
@@ -324,8 +326,7 @@ void HAL_MspInit(void);
  *         If expr is true, it returns no value.
  * @retval None
  */
-#define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
-void assert_failed(uint8_t *file, uint32_t line);
+#define assert_param(expr) ((expr) ? (void)0U : IfErr_PanicHandler())
 #else
 #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */

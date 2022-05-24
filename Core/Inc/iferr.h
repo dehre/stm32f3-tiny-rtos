@@ -5,10 +5,16 @@
  * ```c
  * #include "iferr.h"
  *
+ * void PanicHandler(void)
+ * {
+ *     __disable_irq();
+ *     __asm("BKPT 1");
+ * }
+ *
  * HAL_StatusTypeDef init_peripheral(void)
  * {
  *     IFERR_RETE(some_fn());
- *     IFERR_RETE(another_fn(arg));
+ *     IFERR_PANIC(another_fn(arg));
  *     return HAL_OK;
  * }
  * ```
@@ -18,8 +24,10 @@
 
 #include "stm32f3xx_hal.h"
 
-// TODO LORIS: IFERR_BKPT turns on onboard red led in both debug and release;
-//    it needs iferr_init() to be called, which initializes gpio pin.
+/*
+ * The PanicHandler needs to be implemented, otherwise the linker will fail.
+ */
+void IfErr_PanicHandler(void);
 
 /*
  * If error, return error
@@ -35,28 +43,14 @@
     } while (0)
 
 /*
- * If error, hang there
+ * If error, panic
  */
-#ifdef DEBUG
-#define IFERR_BKPT(x)                                                                                                  \
+#define IFERR_PANIC(x)                                                                                                 \
     do                                                                                                                 \
     {                                                                                                                  \
         HAL_StatusTypeDef err = (x);                                                                                   \
         if (err != HAL_OK)                                                                                             \
         {                                                                                                              \
-            __asm("BKPT 1");                                                                                           \
+            IfErr_PanicHandler();                                                                                      \
         }                                                                                                              \
     } while (0)
-#else
-#define IFERR_BKPT(x)                                                                                                  \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        HAL_StatusTypeDef err = (x);                                                                                   \
-        if (err != HAL_OK)                                                                                             \
-        {                                                                                                              \
-            while (1)                                                                                                  \
-            {                                                                                                          \
-            }                                                                                                          \
-        }                                                                                                              \
-    } while (0)
-#endif
