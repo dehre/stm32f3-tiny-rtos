@@ -13,10 +13,8 @@
 #define OSTimer_IRQPreemptPriority 4
 #define OSTimer_IRQSubPriority 0
 
-extern TIM_HandleTypeDef OSTimer_Handle;
+void OSTimer_Init(void);
 
-HAL_StatusTypeDef OSTimer_Init(void);
-
-HAL_StatusTypeDef OSTimer_Start(void);
+void OSTimer_Start(void);
 
 void OSTimer_ClearITFlag(void);

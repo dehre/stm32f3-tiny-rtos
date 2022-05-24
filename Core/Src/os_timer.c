@@ -4,7 +4,7 @@
 
 #include "os_timer.h"
 
-#include "stm32f3xx_hal.h"
+#include "iferr.h"
 
 //==================================================================================================
 // DEFINES - MACROS
@@ -22,34 +22,34 @@
 // STATIC VARIABLES
 //==================================================================================================
 
+static TIM_HandleTypeDef TIMHandle;
+
 //==================================================================================================
 // GLOBAL FUNCTIONS
 //==================================================================================================
 
-TIM_HandleTypeDef OSTimer_Handle;
-
 // TODO LORIS: adjust values
-HAL_StatusTypeDef OSTimer_Init(void)
+void OSTimer_Init(void)
 {
     /* Compute the prescaler value to have TIM2 counter clock equal to 10 KHz */
     uint32_t uwPrescalerValue = (SystemCoreClock / 10000) - 1;
-    OSTimer_Handle.Instance = OSTimer_Instance;
-    OSTimer_Handle.Init.Period = 10000 - 1;
-    OSTimer_Handle.Init.Prescaler = uwPrescalerValue;
-    OSTimer_Handle.Init.ClockDivision = 0;
-    OSTimer_Handle.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-    OSTimer_Handle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    return HAL_TIM_Base_Init(&OSTimer_Handle);
+    TIMHandle.Instance = OSTimer_Instance;
+    TIMHandle.Init.Period = 10000 - 1;
+    TIMHandle.Init.Prescaler = uwPrescalerValue;
+    TIMHandle.Init.ClockDivision = 0;
+    TIMHandle.Init.CounterMode = TIM_COUNTERMODE_DOWN;
+    TIMHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    IFERR_PANIC(HAL_TIM_Base_Init(&TIMHandle));
 }
 
-HAL_StatusTypeDef OSTimer_Start(void)
+void OSTimer_Start(void)
 {
-    return HAL_TIM_Base_Start_IT(&OSTimer_Handle);
+    IFERR_PANIC(HAL_TIM_Base_Start_IT(&TIMHandle));
 }
 
 void OSTimer_ClearITFlag(void)
 {
-    __HAL_TIM_CLEAR_IT(&OSTimer_Handle, TIM_IT_UPDATE);
+    __HAL_TIM_CLEAR_IT(&TIMHandle, TIM_IT_UPDATE);
 }
 
 //==================================================================================================
