@@ -5,7 +5,7 @@
  * ```c
  * #include "iferr.h"
  *
- * void PanicHandler(void)
+ * void panic(void)
  * {
  *     __disable_irq();
  *     __asm("BKPT 1");
@@ -25,9 +25,9 @@
 #include "stm32f3xx_hal.h"
 
 /*
- * The PanicHandler needs to be implemented, otherwise the linker will fail.
+ * The panic fn is implemented based on user's needs.
  */
-void IfErr_PanicHandler(void);
+void panic(void);
 
 /*
  * If error, return error
@@ -51,6 +51,6 @@ void IfErr_PanicHandler(void);
         HAL_StatusTypeDef err = (x);                                                                                   \
         if (err != HAL_OK)                                                                                             \
         {                                                                                                              \
-            IfErr_PanicHandler();                                                                                      \
+            panic();                                                                                                   \
         }                                                                                                              \
     } while (0)

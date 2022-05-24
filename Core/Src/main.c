@@ -3,6 +3,7 @@
 //==================================================================================================
 
 #include "iferr.h"
+#include "instrument_trigger.h" // TODO LORIS: deleteme
 #include "os.h"
 #include "pins_map.h"
 #include "user_tasks.h"
@@ -48,10 +49,10 @@ int main(void)
     OS_Launch();
 
     /* This statement should not be reached */
-    IfErr_PanicHandler();
+    panic();
 }
 
-void IfErr_PanicHandler(void)
+void panic(void)
 {
     __disable_irq();
     __asm("BKPT 1");

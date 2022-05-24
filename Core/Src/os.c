@@ -156,7 +156,7 @@ void OS_Launch(void)
     OSAsm_Start();
 
     /* This statement should not be reached */
-    IfErr_PanicHandler();
+    panic();
 }
 
 void OS_Scheduler(void)

@@ -1,49 +1,52 @@
 #include "user_tasks.h"
 
+#include "instrument_trigger.h"
+
 #include "stm32f3xx_hal.h"
 #include <stdint.h>
 
-// TODO LORIS: fn or macro to initialize peripherals,
-//     maybe embed the initialization in the task itself.
+/*
+ * Available user LEDs on the STM32F3 Discovery Board:
+ * - LD3:  Red    LED connected to the I/O PE9  of the STM32F303VCT6
+ * - LD4:  Blue   LED connected to the I/O PE8  of the STM32F303VCT6
+ * - LD5:  Orange LED connected to the I/O PE10 of the STM32F303VCT6
+ * - LD6:  Green  LED connected to the I/O PE15 of the STM32F303VCT6
+ * - LD7:  Green  LED connected to the I/O PE11 of the STM32F303VCT6
+ * - LD8:  Orange LED connected to the I/O PE14 of the STM32F303VCT6
+ * - LD9:  Blue   LED connected to the I/O PE12 of the STM32F303VCT6
+ * - LD10: Red    LED connected to the I/O PE13 of the STM32F303VCT6
+ */
+
+InstrumentTrigger_Create(E, 11);
+InstrumentTrigger_Create(E, 12);
+InstrumentTrigger_Create(E, 13);
 
 void UserTask_0(void)
 {
-    static uint32_t n = 0;
+    InstrumentTriggerPE11_Init();
     while (1)
     {
-        if (n > 0x7FFFFF)
-        {
-            n = 0;
-            HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_11);
-        }
-        n++;
+        InstrumentTriggerPE11_Toggle();
+        HAL_Delay(800);
     }
 }
 
 void UserTask_1(void)
 {
-    static uint32_t n = 0;
+    InstrumentTriggerPE12_Init();
     while (1)
     {
-        if (n > 0xFFFFF)
-        {
-            n = 0;
-            HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_12);
-        }
-        n++;
+        InstrumentTriggerPE12_Toggle();
+        HAL_Delay(400);
     }
 }
 
 void UserTask_2(void)
 {
-    static uint32_t n = 0;
+    InstrumentTriggerPE13_Init();
     while (1)
     {
-        if (n > 0xFFFF)
-        {
-            n = 0;
-            HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
-        }
-        n++;
+        InstrumentTriggerPE13_Toggle();
+        HAL_Delay(150);
     }
 }

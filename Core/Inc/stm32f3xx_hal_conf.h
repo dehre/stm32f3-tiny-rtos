@@ -326,7 +326,7 @@ void HAL_MspInit(void);
  *         If expr is true, it returns no value.
  * @retval None
  */
-#define assert_param(expr) ((expr) ? (void)0U : IfErr_PanicHandler())
+#define assert_param(expr) ((expr) ? (void)0U : panic())
 #else
 #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
