@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "os_timer.h"
+#include "schedl_timer.h"
 
 //==================================================================================================
 // CORTEX-M4 PROCESSOR INTERRUPTION AND EXCEPTION HANDLERS
@@ -62,7 +62,7 @@ void SysTick_Handler(void);
 //==================================================================================================
 
 /**
- * The function OSTimer_IRQHandler handles OSTimer interrupts.
+ * The function SchedlTimer_IRQHandler handles SchedlTimer interrupts.
  * The implementation is in os_asm.s
  */
-void OSTimer_IRQHandler(void);
+void SchedlTimer_IRQHandler(void);

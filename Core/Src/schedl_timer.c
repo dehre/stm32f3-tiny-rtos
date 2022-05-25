@@ -2,7 +2,7 @@
 // INCLUDES
 //==================================================================================================
 
-#include "os_timer.h"
+#include "schedl_timer.h"
 
 #include "iferr.h"
 
@@ -28,11 +28,11 @@ static TIM_HandleTypeDef TIMHandle;
 // GLOBAL FUNCTIONS
 //==================================================================================================
 
-void OSTimer_Init(uint32_t reload_frequency_hz)
+void SchedlTimer_Init(uint32_t reload_frequency_hz)
 {
     /* Compute the prescaler value to have TIM2 counter clock equal to 1 KHz */
     uint32_t prescaler_divisions = 1000;
-    TIMHandle.Instance = OSTimer_Instance;
+    TIMHandle.Instance = SchedlTimer_Instance;
     TIMHandle.Init.Prescaler = (SystemCoreClock / prescaler_divisions) - 1;
     TIMHandle.Init.Period = (prescaler_divisions / reload_frequency_hz) - 1;
     TIMHandle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -41,12 +41,12 @@ void OSTimer_Init(uint32_t reload_frequency_hz)
     IFERR_PANIC(HAL_TIM_Base_Init(&TIMHandle));
 }
 
-void OSTimer_Start(void)
+void SchedlTimer_Start(void)
 {
     IFERR_PANIC(HAL_TIM_Base_Start_IT(&TIMHandle));
 }
 
-void OSTimer_ClearITFlag(void)
+void SchedlTimer_ClearITFlag(void)
 {
     __HAL_TIM_CLEAR_IT(&TIMHandle, TIM_IT_UPDATE);
 }

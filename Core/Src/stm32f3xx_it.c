@@ -4,8 +4,6 @@
 
 #include "stm32f3xx_it.h"
 
-#include "os_timer.h"
-
 #include "core_cm4.h"
 #include "stm32f3xx_hal.h"
 #include <stdbool.h>

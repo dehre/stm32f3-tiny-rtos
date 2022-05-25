@@ -5,7 +5,7 @@
 #include "os.h"
 
 #include "iferr.h"
-#include "os_timer.h"
+#include "schedl_timer.h"
 
 #include "stm32f3xx_hal.h"
 
@@ -50,12 +50,12 @@ static void OS_SetInitialStack(uint32_t i);
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void));
 
 /**
- * The fn OS_Init initializes the OS_Timer and the Sleep_Timer.
+ * The fn OS_Init initializes the SchedlTimer and the SleepTimer.
  */
 void OS_Init(uint32_t scheduler_frequency_hz);
 
 /**
- * The fn OS_Launch enables the OS_Timer and the Sleep_Timer, then calls OSAsm_Start,
+ * The fn OS_Launch enables the SchedlTimer and the SleepTimer, then calls OSAsm_Start,
  * which launches the first thread.
  */
 void OS_Launch(void);
@@ -67,7 +67,7 @@ void OS_Launch(void);
 extern void OSAsm_Start(void);
 
 /**
- * The fn OSAsm_ThreadSwitch, implemented in os_asm.s, is periodically called by the OS_Timer (ISR).
+ * The fn OSAsm_ThreadSwitch, implemented in os_asm.s, is periodically called by the SchedlTimer (ISR).
  * It preemptively switches to the next thread, that is, it stores the stack of the running
  * thread and restores the stack of the next thread.
  * It calls OS_Schedule to determine which thread is run next and update RunPt.
@@ -89,7 +89,7 @@ void OS_Suspend(void);
 /**
  * The fn OS_Sleep makes the current thread dormant for a specified time.
  * It's called by the running thread itself.
- * The fn OS_DecrementTCBsSleepValue is called by Sleep_Timer every ms and decrements the
+ * The fn OS_DecrementTCBsSleepValue is called by SleepTimer every ms and decrements the
  * the value of sleep on the TCBs.
  */
 void OS_Sleep(uint32_t ms);
@@ -142,7 +142,7 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
 
 void OS_Init(uint32_t scheduler_frequency_hz)
 {
-    OSTimer_Init(scheduler_frequency_hz);
+    SchedlTimer_Init(scheduler_frequency_hz);
 }
 
 void OS_Launch(void)
@@ -150,7 +150,7 @@ void OS_Launch(void)
     /* Prevent the timer's ISR from firing before OSAsm_Start is called */
     __disable_irq();
 
-    OSTimer_Start();
+    SchedlTimer_Start();
     OSAsm_Start();
 
     /* This statement should not be reached */

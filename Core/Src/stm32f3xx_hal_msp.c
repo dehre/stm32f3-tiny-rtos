@@ -4,7 +4,7 @@
 
 #include "stm32f3xx_hal_msp.h"
 
-#include "os_timer.h"
+#include "schedl_timer.h"
 
 //==================================================================================================
 // GLOBAL FUNCTIONS
@@ -19,7 +19,7 @@ void HAL_MspInit(void)
 
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
-    OSTimer_ClkEnable();
-    HAL_NVIC_SetPriority(OSTimer_IRQn, OSTimer_IRQPreemptPriority, OSTimer_IRQSubPriority);
-    HAL_NVIC_EnableIRQ(OSTimer_IRQn);
+    SchedlTimer_ClkEnable();
+    HAL_NVIC_SetPriority(SchedlTimer_IRQn, SchedlTimer_IRQPreemptPriority, SchedlTimer_IRQSubPriority);
+    HAL_NVIC_EnableIRQ(SchedlTimer_IRQn);
 }
