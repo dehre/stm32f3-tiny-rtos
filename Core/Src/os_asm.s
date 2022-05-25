@@ -31,6 +31,8 @@ OSAsm_Start:
     CPSIE   I                  @ enable interrupts
     BX      LR                 @ start first thread
 
+@ TODO LORIS: aligned comments, one space further
+
 .section    .text.OSAsm_ThreadSwitch
 .type	OSAsm_ThreadSwitch, %function
 OSAsm_ThreadSwitch:

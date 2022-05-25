@@ -8,7 +8,7 @@
 
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void));
 
-void OS_Init(uint32_t schedulerFrequencyHz);
+void OS_Init(uint32_t scheduler_frequency_hz);
 
 void OS_Launch(void);
 

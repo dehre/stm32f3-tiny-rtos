@@ -25,9 +25,14 @@
 #include "stm32f3xx_hal.h"
 
 /*
- * The panic fn is implemented based on user's needs.
+ * The panic fn is implemented based on user's needs
  */
 void panic(void);
+
+/*
+ * Assert, or call panic
+ */
+#define assert_or_panic(expr) ((expr) ? (void)0U : panic())
 
 /*
  * If error, return error

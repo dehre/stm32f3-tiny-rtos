@@ -53,7 +53,7 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
 // The fn OS_Init sets the clock?, then initializes OS_Timer and Sleep_Timer.
 // TODO LORIS: rephrase
 //
-void OS_Init(uint32_t schedulerFrequencyHz);
+void OS_Init(uint32_t scheduler_frequency_hz);
 
 //
 // The fn OS_Launch enables OS_Timer and Sleep_Timer, then calls OSAsm_Start,
@@ -140,16 +140,13 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
     RunPt = &(TCBs[0]); // thread 0 will run first
 }
 
-void OS_Init(uint32_t schedulerFrequencyHz)
+void OS_Init(uint32_t scheduler_frequency_hz)
 {
-    // TODO LORIS: setup clock as part of OS_Init ?
-    // TODO LORIS: param to adjust frequency
-    OSTimer_Init();
+    OSTimer_Init(scheduler_frequency_hz);
 }
 
 void OS_Launch(void)
 {
-    // TODO LORIS: do I really need to disable irq here?
     /* prevent the timer's ISR from firing before OSAsm_Start is called */
     __disable_irq();
     OSTimer_Start();

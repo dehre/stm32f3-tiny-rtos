@@ -6,8 +6,6 @@
 
 #include "iferr.h"
 
-void HAL_MspInit(void);
-
 //==================================================================================================
 // MODULE SELECTION
 //==================================================================================================
@@ -312,7 +310,7 @@ void HAL_MspInit(void);
 #endif /* HAL_WWDG_MODULE_ENABLED */
 
 /**
- * @brief Comment the line below to make the "assert_param" macro a no-op
+ * @brief Comment out the line below to make the "assert_param" macro a no-op
  *        in the HAL drivers code
  */
 #define USE_FULL_ASSERT 1U

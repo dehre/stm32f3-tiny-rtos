@@ -28,17 +28,16 @@ static TIM_HandleTypeDef TIMHandle;
 // GLOBAL FUNCTIONS
 //==================================================================================================
 
-// TODO LORIS: adjust values
-void OSTimer_Init(void)
+void OSTimer_Init(uint32_t reload_frequency_hz)
 {
-    /* Compute the prescaler value to have TIM2 counter clock equal to 10 KHz */
-    uint32_t uwPrescalerValue = (SystemCoreClock / 10000) - 1;
+    /* Compute the prescaler value to have TIM2 counter clock equal to 1 KHz */
+    uint32_t prescaler_divisions = 1000;
     TIMHandle.Instance = OSTimer_Instance;
-    TIMHandle.Init.Period = 10000 - 1;
-    TIMHandle.Init.Prescaler = uwPrescalerValue;
-    TIMHandle.Init.ClockDivision = 0;
+    TIMHandle.Init.Prescaler = (SystemCoreClock / prescaler_divisions) - 1;
+    TIMHandle.Init.Period = (prescaler_divisions / reload_frequency_hz) - 1;
+    TIMHandle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     TIMHandle.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-    TIMHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    assert_or_panic(TIMHandle.Init.Period > 0);
     IFERR_PANIC(HAL_TIM_Base_Init(&TIMHandle));
 }
 
