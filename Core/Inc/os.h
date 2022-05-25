@@ -1,10 +1,19 @@
+/**
+ * The module os encapsulates the core functionality of the operating system and
+ * exposes the functions for interacting with it.
+ */
+
 #pragma once
 
 #include <stdint.h>
 
-#define NUMTHREADS 3    // maximum number of threads
-#define STACKSIZE 100   // number of 32-bit words in stack
-#define THREADFREQ 1000 // maximum time-slice before the scheduler is run, in Hz
+#define NUMTHREADS 3  /* Maximum number of threads */
+#define STACKSIZE 100 /* Number of 32-bit words in each TCB's stack */
+#define THREADFREQ 10 /* Maximum time-slice, in Hz, before the scheduler is run */
+
+/**
+ * Function descriptions are provided in os.c
+ */
 
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void));
 

@@ -1,5 +1,5 @@
-/*
- * HAL configuration file.
+/**
+ * The HAL configuration file.
  */
 
 #pragma once

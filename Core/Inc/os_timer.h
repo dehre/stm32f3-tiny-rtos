@@ -1,6 +1,8 @@
-/*
- * This module encapsulates the timer functionality used by the OS scheduler.
+/**
+ * The module os_timer abstract the timer functionality used by the OS scheduler.
  */
+
+// TODO LORIS: rename to SchedTimer
 
 #pragma once
 
@@ -19,5 +21,5 @@ void OSTimer_Start(void);
 
 void OSTimer_ClearITFlag(void);
 
-/* implemented in os_asm.s */
+/* Implemented in os_asm.s */
 void OSTimer_IRQHandler(void);

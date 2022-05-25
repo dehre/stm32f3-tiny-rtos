@@ -1,9 +1,13 @@
-/*
- * This header file provides macros for shortening error-handling.
+/**
+ * The module iferr provides macros for shortening error-handling.
+ * The fn panic is implemented by the caller.
  *
  * Example:
  * ```c
  * #include "iferr.h"
+ *
+ * HAL_StatusTypeDef fn_a(bool arg);
+ * HAL_StatusTypeDef fn_b(void);
  *
  * void panic(void)
  * {
@@ -11,10 +15,11 @@
  *     __asm("BKPT 1");
  * }
  *
- * HAL_StatusTypeDef init_peripheral(void)
+ * HAL_StatusTypeDef init_peripheral(uint32_t arg1, bool arg2)
  * {
- *     IFERR_RETE(some_fn());
- *     IFERR_PANIC(another_fn(arg));
+ *     assert_or_panic(arg1 < 10);
+ *     IFERR_RETE (fn_a(arg2));
+ *     IFERR_PANIC(fn_b());
  *     return HAL_OK;
  * }
  * ```
@@ -24,18 +29,18 @@
 
 #include "stm32f3xx_hal.h"
 
-/*
- * The panic fn is implemented based on user's needs
+/**
+ * The panic fn is implemented by the caller.
  */
 void panic(void);
 
-/*
- * Assert, or call panic
+/**
+ * Assert, or panic.
  */
 #define assert_or_panic(expr) ((expr) ? (void)0U : panic())
 
-/*
- * If error, return error
+/**
+ * If error, return error.
  */
 #define IFERR_RETE(x)                                                                                                  \
     do                                                                                                                 \
@@ -47,8 +52,8 @@ void panic(void);
         }                                                                                                              \
     } while (0)
 
-/*
- * If error, panic
+/**
+ * If error, panic.
  */
 #define IFERR_PANIC(x)                                                                                                 \
     do                                                                                                                 \

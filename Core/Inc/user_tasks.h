@@ -1,5 +1,5 @@
-/*
- * This module provides three (example) user-defined tasks to be run by the OS.
+/**
+ * The module user_tasks provides dummy tasks to be run by the OS.
  */
 
 #pragma once

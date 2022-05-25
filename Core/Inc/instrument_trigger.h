@@ -1,8 +1,10 @@
-/*
- * Setup a GPIO pin for triggering a debugging instrument, eg. oscilloscope or logic analyzer.
+/**
+ * The module instrument_trigger provides a macro that generates functions to set up and
+ * use a GPIO pin as push-pull output.
+ * Those pins are useful for toggling LED and/or triggering a debugging instrument,
+ * i.e. an oscilloscope or a logic analyzer.
  *
- * USAGE:
- *
+ * Example:
  * ```c
  * #include "instrument-trigger.h"
  * InstrumentTrigger_Create(E, 13);

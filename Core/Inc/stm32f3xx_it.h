@@ -1,5 +1,5 @@
-/*
- * This module provides the interrupt and exception handlers.
+/**
+ * The module stm32f3xx_it provides the interrupt and exception handlers.
  */
 
 #pragma once
@@ -11,57 +11,58 @@
 //==================================================================================================
 
 /**
- * @brief This function handles Non maskable interrupt.
+ * The function NMI_Handler handles non maskable interrupts.
  */
 void NMI_Handler(void);
 
 /**
- * @brief This function handles Hard fault interrupt.
+ * The function HardFault_Handler handles hard fault interrupts.
  */
 void HardFault_Handler(void);
 
 /**
- * @brief This function handles Memory management fault.
+ * The function MemManage_Handler handles memory management faults.
  */
 void MemManage_Handler(void);
 
 /**
- * @brief This function handles Pre-fetch fault, memory access fault.
+ * The function BusFault_Handler handles pre-fetch faults and memory access faults.
  */
 void BusFault_Handler(void);
 
 /**
- * @brief This function handles Undefined instruction or illegal state.
+ * The function UsageFault_Handler handles undefined instructions or illegal states.
  */
 void UsageFault_Handler(void);
 
 /**
- * @brief This function handles System service call via SWI instruction.
+ * The function SVC_Handler handles system service calls via SWI instruction.
  */
 void SVC_Handler(void);
 
 /**
- * @brief This function handles Debug monitor.
+ * The function DebugMon_Handler handles debug monitors.
  */
 void DebugMon_Handler(void);
 
 /**
- * @brief This function handles Pendable request for system service.
+ * The function PendSV_Handler handles pendable requests for system service.
  */
 void PendSV_Handler(void);
 
 /**
- * @brief This function handles System tick timer.
+ * The function SysTick_Handler handles system tick timer interrupts.
  */
 void SysTick_Handler(void);
 
 //==================================================================================================
 // STM32F3xx PERIPHERAL INTERRUPT HANDLERS
 // For the available peripheral interrupt handler names,
-// please refer to the startup file (startup_stm32f3xx.s).
+// refer to the startup file (startup_stm32f3xx.s).
 //==================================================================================================
 
 /**
- * @brief This function handles interrupts for the OSTimer and is defined in os_asm.s 
+ * The function OSTimer_IRQHandler handles OSTimer interrupts.
+ * The implementation is in os_asm.s
  */
-void TIM2_IRQHandler(void);
+void OSTimer_IRQHandler(void);

@@ -16,11 +16,11 @@
 
 typedef struct
 {
-    uint32_t CFSReg; // Configurable Fault Status Register
-    uint16_t UFSReg; // Usage Fault Status Registers
-    uint8_t BFSReg;  // Bus Fault Status Registers
-    uint8_t MMFSReg; // Memory Manage Fault Status Registers
-    uint32_t HFSReg; // HardFault Status Register
+    uint32_t CFSReg; /* Configurable Fault Status Register */
+    uint16_t UFSReg; /* Usage Fault Status Registers */
+    uint8_t BFSReg;  /* Bus Fault Status Registers */
+    uint8_t MMFSReg; /* Memory Manage Fault Status Registers */
+    uint32_t HFSReg; /* HardFault Status Register */
 
     /* Usage Faults */
     bool DIVBYZERO;
@@ -57,13 +57,13 @@ typedef struct
 // STATIC PROTOTYPES
 //==================================================================================================
 
-static void DecodeHardFault(void);
+static void InspectHardFault(void);
 
 //==================================================================================================
 // STATIC VARIABLES
 //==================================================================================================
 
-static __USED HardFaultStatusRegisters_t HardFaultStatusReg = {0};
+static __USED HardFaultStatusRegisters_t HardFaultStatusRegs;
 
 //==================================================================================================
 // CORTEX-M4 PROCESSOR INTERRUPTION AND EXCEPTION HANDLERS
@@ -78,9 +78,9 @@ void NMI_Handler(void)
 
 void HardFault_Handler(void)
 {
-    // To determine what caused the fault, inspect the HardFaultStatusReg variable.
-    // Useful article: https://interrupt.memfault.com/blog/cortex-m-fault-debug
-    DecodeHardFault();
+    /* To determine what caused the fault, inspect the global variable HardFaultStatusRegs.
+     * Useful article: https://interrupt.memfault.com/blog/cortex-m-fault-debug */
+    InspectHardFault();
     while (1)
     {
     }
@@ -134,7 +134,7 @@ void SysTick_Handler(void)
 // STATIC FUNCTIONS
 //==================================================================================================
 
-static void DecodeHardFault(void)
+static void InspectHardFault(void)
 {
     uint32_t *cfsr_addr = (uint32_t *)0xE000ED28;
     uint32_t cfsr = *cfsr_addr;
@@ -142,7 +142,7 @@ static void DecodeHardFault(void)
     uint32_t *hfsr_addr = (uint32_t *)0xE000ED2C;
     uint32_t hfsr = *hfsr_addr;
 
-    HardFaultStatusReg = (HardFaultStatusRegisters_t){
+    HardFaultStatusRegs = (HardFaultStatusRegisters_t){
         .CFSReg = cfsr,
         .UFSReg = cfsr >> SCB_CFSR_USGFAULTSR_Pos,
         .BFSReg = cfsr >> SCB_CFSR_BUSFAULTSR_Pos,
