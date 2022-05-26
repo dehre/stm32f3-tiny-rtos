@@ -19,5 +19,7 @@ void SchedlTimer_Start(void);
 
 void SchedlTimer_ClearITFlag(void);
 
+void SchedlTimer_ResetCounter(void);
+
 /* Implemented in os_asm.s */
 void SchedlTimer_IRQHandler(void);

@@ -161,3 +161,8 @@ void OS_Scheduler(void)
 {
     RunPt = RunPt->next;
 }
+
+void OS_Suspend(void)
+{
+    SchedlTimer_ResetCounter();
+}

@@ -1,6 +1,7 @@
 #include "user_tasks.h"
 
 #include "instrument_trigger.h"
+#include "os.h"
 
 #include "stm32f3xx_hal.h"
 #include <stdint.h>
@@ -15,7 +16,7 @@ void UserTask_0(void)
     while (1)
     {
         InstrumentTriggerPE11_Toggle();
-        HAL_Delay(800);
+        HAL_Delay(200);
     }
 }
 
@@ -24,8 +25,12 @@ void UserTask_1(void)
     InstrumentTriggerPE12_Init();
     while (1)
     {
-        InstrumentTriggerPE12_Toggle();
-        HAL_Delay(400);
+        for (uint32_t i = 0; i <= 8; i++)
+        {
+            InstrumentTriggerPE12_Toggle();
+            HAL_Delay(80);
+        }
+        OS_Suspend();
     }
 }
 

@@ -9,7 +9,7 @@
 
 #define NUMTHREADS 3  /* Maximum number of threads */
 #define STACKSIZE 100 /* Number of 32-bit words in each TCB's stack */
-#define THREADFREQ 10 /* Maximum time-slice, in Hz, before the scheduler is run */
+#define THREADFREQ 1  /* Maximum time-slice, in Hz, before the scheduler is run */
 
 /**
  * Function descriptions are provided in os.c
@@ -22,3 +22,5 @@ void OS_Init(uint32_t scheduler_frequency_hz);
 void OS_Launch(void);
 
 void OS_Scheduler(void);
+
+void OS_Suspend(void);
