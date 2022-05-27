@@ -106,24 +106,24 @@ static void OS_SetInitialStack(uint32_t i)
 {
     /* From the "STM32 Cortex-M4 Programming Manual" on page 23:
      * attempting to execute instructions when  the T bit is 0 results in a fault or lockup */
-    Stacks[i][STACKSIZE - 1] = 0x01000000; // Thumb Bit (PSR)
-    // Stacks[i][STACKSIZE - 2] =           // R15 (PC) -> set later in fn OS_AddThreads
-    Stacks[i][STACKSIZE - 3] = 0x14141414;  // R14 (LR)
-    Stacks[i][STACKSIZE - 4] = 0x12121212;  // R12
-    Stacks[i][STACKSIZE - 5] = 0x03030303;  // R3
-    Stacks[i][STACKSIZE - 6] = 0x02020202;  // R2
-    Stacks[i][STACKSIZE - 7] = 0x01010101;  // R1
-    Stacks[i][STACKSIZE - 8] = 0x00000000;  // R0
-    Stacks[i][STACKSIZE - 9] = 0x11111111;  // R11
-    Stacks[i][STACKSIZE - 10] = 0x10101010; // R10
-    Stacks[i][STACKSIZE - 11] = 0x09090909; // R9
-    Stacks[i][STACKSIZE - 12] = 0x08080808; // R8
-    Stacks[i][STACKSIZE - 13] = 0x07070707; // R7
-    Stacks[i][STACKSIZE - 14] = 0x06060606; // R6
-    Stacks[i][STACKSIZE - 15] = 0x05050505; // R5
-    Stacks[i][STACKSIZE - 16] = 0x04040404; // R4
+    Stacks[i][STACKSIZE - 1] = 0x01000000; /* Thumb Bit (PSR) */
+    // Stacks[i][STACKSIZE - 2] =           /* R15 (PC) -> set later in fn OS_AddThreads
+    Stacks[i][STACKSIZE - 3] = 0x14141414;  /* R14 (LR) */
+    Stacks[i][STACKSIZE - 4] = 0x12121212;  /* R12 */
+    Stacks[i][STACKSIZE - 5] = 0x03030303;  /* R3 */
+    Stacks[i][STACKSIZE - 6] = 0x02020202;  /* R2 */
+    Stacks[i][STACKSIZE - 7] = 0x01010101;  /* R1 */
+    Stacks[i][STACKSIZE - 8] = 0x00000000;  /* R0 */
+    Stacks[i][STACKSIZE - 9] = 0x11111111;  /* R11 */
+    Stacks[i][STACKSIZE - 10] = 0x10101010; /* R10 */
+    Stacks[i][STACKSIZE - 11] = 0x09090909; /* R9 */
+    Stacks[i][STACKSIZE - 12] = 0x08080808; /* R8 */
+    Stacks[i][STACKSIZE - 13] = 0x07070707; /* R7 */
+    Stacks[i][STACKSIZE - 14] = 0x06060606; /* R6 */
+    Stacks[i][STACKSIZE - 15] = 0x05050505; /* R5 */
+    Stacks[i][STACKSIZE - 16] = 0x04040404; /* R4 */
 
-    TCBs[i].sp = &Stacks[i][STACKSIZE - 16]; // thread's stack pointer
+    TCBs[i].sp = &Stacks[i][STACKSIZE - 16]; /* Thread's stack pointer */
 }
 
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void))
@@ -133,11 +133,11 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
     TCBs[2].next = &(TCBs[0]);
 
     OS_SetInitialStack(0);
-    Stacks[0][STACKSIZE - 2] = (int32_t)task0; // PC
+    Stacks[0][STACKSIZE - 2] = (int32_t)task0; /* PC */
     OS_SetInitialStack(1);
-    Stacks[1][STACKSIZE - 2] = (int32_t)task1; // PC
+    Stacks[1][STACKSIZE - 2] = (int32_t)task1; /* PC */
     OS_SetInitialStack(2);
-    Stacks[2][STACKSIZE - 2] = (int32_t)task2; // PC
+    Stacks[2][STACKSIZE - 2] = (int32_t)task2; /* PC */
 
     /* Thread 0 will run first */
     RunPt = &(TCBs[0]);
