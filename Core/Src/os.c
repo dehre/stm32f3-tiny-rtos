@@ -19,6 +19,10 @@
 
 /**
  * Thread Control Block
+ *
+ * IMPORTANT!
+ * The fn OSAsm_Start and OSAsm_ThreadSwitch, implemented in os_asm.s, expect the stack pointer
+ * to be placed first in the struct. Don't shuffle it!
  */
 typedef struct TCB
 {
