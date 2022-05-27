@@ -50,7 +50,7 @@ TCB_t *RunPt;
  * set up the stack for each of them as if they had already been running and then suspended.
  * Check the "STM32 Cortex-M4 Programming Manual" on page 18 for the list of processor core registers.
  */
-static void OS_SetInitialStack(uint32_t i);
+static void OS_SetInitialStack(uint32_t tcb_idx);
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void));
 
 /**
@@ -102,28 +102,28 @@ void OS_DecrementTCBsSleepDuration(void);
 // IMPLEMENTATION
 //==================================================================================================
 
-static void OS_SetInitialStack(uint32_t i)
+static void OS_SetInitialStack(uint32_t tcb_idx)
 {
     /* From the "STM32 Cortex-M4 Programming Manual" on page 23:
      * attempting to execute instructions when  the T bit is 0 results in a fault or lockup */
-    Stacks[i][STACKSIZE - 1] = 0x01000000; /* Thumb Bit (PSR) */
-    // Stacks[i][STACKSIZE - 2] =           /* R15 (PC) -> set later in fn OS_AddThreads
-    Stacks[i][STACKSIZE - 3] = 0x14141414;  /* R14 (LR) */
-    Stacks[i][STACKSIZE - 4] = 0x12121212;  /* R12 */
-    Stacks[i][STACKSIZE - 5] = 0x03030303;  /* R3 */
-    Stacks[i][STACKSIZE - 6] = 0x02020202;  /* R2 */
-    Stacks[i][STACKSIZE - 7] = 0x01010101;  /* R1 */
-    Stacks[i][STACKSIZE - 8] = 0x00000000;  /* R0 */
-    Stacks[i][STACKSIZE - 9] = 0x11111111;  /* R11 */
-    Stacks[i][STACKSIZE - 10] = 0x10101010; /* R10 */
-    Stacks[i][STACKSIZE - 11] = 0x09090909; /* R9 */
-    Stacks[i][STACKSIZE - 12] = 0x08080808; /* R8 */
-    Stacks[i][STACKSIZE - 13] = 0x07070707; /* R7 */
-    Stacks[i][STACKSIZE - 14] = 0x06060606; /* R6 */
-    Stacks[i][STACKSIZE - 15] = 0x05050505; /* R5 */
-    Stacks[i][STACKSIZE - 16] = 0x04040404; /* R4 */
+    Stacks[tcb_idx][STACKSIZE - 1] = 0x01000000; /* Thumb Bit (PSR) */
+    // Stacks[tcb_idx][STACKSIZE - 2] =           /* R15 (PC) -> set later in fn OS_AddThreads
+    Stacks[tcb_idx][STACKSIZE - 3] = 0x14141414;  /* R14 (LR) */
+    Stacks[tcb_idx][STACKSIZE - 4] = 0x12121212;  /* R12 */
+    Stacks[tcb_idx][STACKSIZE - 5] = 0x03030303;  /* R3 */
+    Stacks[tcb_idx][STACKSIZE - 6] = 0x02020202;  /* R2 */
+    Stacks[tcb_idx][STACKSIZE - 7] = 0x01010101;  /* R1 */
+    Stacks[tcb_idx][STACKSIZE - 8] = 0x00000000;  /* R0 */
+    Stacks[tcb_idx][STACKSIZE - 9] = 0x11111111;  /* R11 */
+    Stacks[tcb_idx][STACKSIZE - 10] = 0x10101010; /* R10 */
+    Stacks[tcb_idx][STACKSIZE - 11] = 0x09090909; /* R9 */
+    Stacks[tcb_idx][STACKSIZE - 12] = 0x08080808; /* R8 */
+    Stacks[tcb_idx][STACKSIZE - 13] = 0x07070707; /* R7 */
+    Stacks[tcb_idx][STACKSIZE - 14] = 0x06060606; /* R6 */
+    Stacks[tcb_idx][STACKSIZE - 15] = 0x05050505; /* R5 */
+    Stacks[tcb_idx][STACKSIZE - 16] = 0x04040404; /* R4 */
 
-    TCBs[i].sp = &Stacks[i][STACKSIZE - 16]; /* Thread's stack pointer */
+    TCBs[tcb_idx].sp = &Stacks[tcb_idx][STACKSIZE - 16]; /* Thread's stack pointer */
 }
 
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void))
@@ -183,11 +183,11 @@ void OS_Sleep(uint32_t sleep_duration_ms)
 
 void OS_DecrementTCBsSleepDuration(void)
 {
-    for (size_t idx = 0; idx < NUMTHREADS; idx++)
+    for (size_t tcb_idx = 0; tcb_idx < NUMTHREADS; tcb_idx++)
     {
-        if (TCBs[idx].sleep > 0)
+        if (TCBs[tcb_idx].sleep > 0)
         {
-            TCBs[idx].sleep -= 1;
+            TCBs[tcb_idx].sleep -= 1;
         }
     }
 }
