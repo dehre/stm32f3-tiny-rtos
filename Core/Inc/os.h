@@ -24,3 +24,7 @@ void OS_Launch(void);
 void OS_Scheduler(void);
 
 void OS_Suspend(void);
+
+void OS_Sleep(uint32_t sleep_duration_ms);
+
+void OS_DecrementTCBsSleepDuration(void);

@@ -22,9 +22,9 @@
  */
 typedef struct TCB
 {
-    uint32_t *sp;     /* stack pointer, valid for threads not running */
-    struct TCB *next; /* pointer to circular-linked-list of TCBs */
-    uint32_t sleep;   /* 0 means not sleeping */
+    uint32_t *sp;     /* Stack pointer, valid for threads not running */
+    struct TCB *next; /* Pointer to circular-linked-list of TCBs */
+    uint32_t sleep;   /* Sleep duration in ms, zero means not sleeping */
 } TCB_t;
 
 //==================================================================================================
@@ -50,13 +50,12 @@ static void OS_SetInitialStack(uint32_t i);
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void));
 
 /**
- * The fn OS_Init initializes the SchedlTimer and the SleepTimer.
+ * The fn OS_Init initializes the SchedlTimer.
  */
 void OS_Init(uint32_t scheduler_frequency_hz);
 
 /**
- * The fn OS_Launch enables the SchedlTimer and the SleepTimer, then calls OSAsm_Start,
- * which launches the first thread.
+ * The fn OS_Launch enables the SchedlTimer, then calls OSAsm_Start, which launches the first thread.
  */
 void OS_Launch(void);
 
@@ -89,11 +88,11 @@ void OS_Suspend(void);
 /**
  * The fn OS_Sleep makes the current thread dormant for a specified time.
  * It's called by the running thread itself.
- * The fn OS_DecrementTCBsSleepValue is called by SleepTimer every ms and decrements the
+ * The fn OS_DecrementTCBsSleepDuration is called by the SysTick ISR every ms and decrements the
  * the value of sleep on the TCBs.
  */
 void OS_Sleep(uint32_t ms);
-static void OS_DecrementTCBsSleepValue(void);
+void OS_DecrementTCBsSleepDuration(void);
 
 //==================================================================================================
 // IMPLEMENTATION
@@ -160,9 +159,31 @@ void OS_Launch(void)
 void OS_Scheduler(void)
 {
     RunPt = RunPt->next;
+    /* Skip sleeping threads; this implementation crashes if all threads are sleeping */
+    while ((RunPt->sleep) > 0)
+    {
+        RunPt = RunPt->next;
+    }
 }
 
 void OS_Suspend(void)
 {
     SchedlTimer_ResetCounter();
+}
+
+void OS_Sleep(uint32_t sleep_duration_ms)
+{
+    RunPt->sleep = sleep_duration_ms;
+    OS_Suspend();
+}
+
+void OS_DecrementTCBsSleepDuration(void)
+{
+    for (size_t idx = 0; idx < NUMTHREADS; idx++)
+    {
+        if (TCBs[idx].sleep > 0)
+        {
+            TCBs[idx].sleep -= 1;
+        }
+    }
 }

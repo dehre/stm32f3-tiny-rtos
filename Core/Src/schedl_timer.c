@@ -60,6 +60,8 @@ void SchedlTimer_ClearITFlag(void)
 void SchedlTimer_ResetCounter(void)
 {
     __HAL_TIM_SET_COUNTER(&TIMHandle, 0);
+    /* Don't return from this fn before the interrupt triggered */
+    HAL_Delay(1);
 }
 
 //==================================================================================================

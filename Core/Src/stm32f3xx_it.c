@@ -4,6 +4,8 @@
 
 #include "stm32f3xx_it.h"
 
+#include "os.h"
+
 #include "core_cm4.h"
 #include "stm32f3xx_hal.h"
 #include <stdbool.h>
@@ -120,6 +122,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
+    OS_DecrementTCBsSleepDuration();
 }
 
 //==================================================================================================
