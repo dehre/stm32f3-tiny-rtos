@@ -30,3 +30,5 @@ void OS_Thread_Suspend(void);
 void OS_Thread_Sleep(uint32_t sleep_duration_ms);
 
 void OS_DecrementTCBsSleepDuration(void);
+
+void OS_Thread_Kill(void);

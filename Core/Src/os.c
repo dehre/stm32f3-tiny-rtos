@@ -136,6 +136,12 @@ void OS_Thread_Suspend(void);
 void OS_Thread_Sleep(uint32_t ms);
 void OS_DecrementTCBsSleepDuration(void);
 
+/**
+ * The fn OS_Thread_Kill kills the thread that calls it, then starts the thread scheduled next.
+ * It fails if the last active thread tries to kill itself.
+ */
+void OS_Thread_Kill(void);
+
 //==================================================================================================
 // IMPLEMENTATION
 //==================================================================================================
@@ -262,4 +268,26 @@ void OS_DecrementTCBsSleepDuration(void)
             TCBs[tcb_idx].sleep -= 1;
         }
     }
+}
+
+void OS_Thread_Kill(void)
+{
+    assert_or_panic(ActiveTCBsCount > 1);
+    __disable_irq();
+
+    TCB_t *previous_tcb = RunPt;
+    while (1)
+    {
+        previous_tcb = previous_tcb->next;
+        if (previous_tcb->next == RunPt)
+            break;
+    }
+    TCB_t *next_tcb = RunPt->next;
+
+    previous_tcb->next = next_tcb;
+    RunPt->status = TCBStateFree;
+
+    ActiveTCBsCount--;
+    __enable_irq();
+    OS_Thread_Suspend();
 }

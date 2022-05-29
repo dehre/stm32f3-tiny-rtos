@@ -14,9 +14,11 @@
 // DEFINES - MACROS
 //==================================================================================================
 
-InstrumentTrigger_Create(E, 11);
-InstrumentTrigger_Create(E, 12);
-InstrumentTrigger_Create(E, 13);
+/* See instrument_trigger.h for the available LEDs on the STM32F3DISCOVERY board */
+InstrumentTrigger_Create(E, 11); /* UserTask_0 */
+InstrumentTrigger_Create(E, 12); /* UserTask_1 */
+InstrumentTrigger_Create(E, 13); /* UserTask_2 */
+InstrumentTrigger_Create(E, 14); /* UserTask_3 */
 
 //==================================================================================================
 // ENUMS - STRUCTS - TYPEDEFS
@@ -37,10 +39,21 @@ InstrumentTrigger_Create(E, 13);
 void UserTask_0(void)
 {
     InstrumentTriggerPE11_Init();
+    uint32_t count = 0;
     while (1)
     {
         InstrumentTriggerPE11_Toggle();
         HAL_Delay(60);
+        count++;
+        if (count == 100)
+        {
+            OS_Thread_Create(UserTask_3);
+        }
+        if (count == 200)
+        {
+            InstrumentTriggerPE11_Reset();
+            OS_Thread_Kill();
+        }
     }
 }
 
@@ -70,6 +83,16 @@ void UserTask_2(void)
             OS_Thread_Sleep(4500);
         else
             HAL_Delay(70);
+    }
+}
+
+void UserTask_3(void)
+{
+    InstrumentTriggerPE14_Init();
+    while (1)
+    {
+        InstrumentTriggerPE14_Toggle();
+        HAL_Delay(60);
     }
 }
 
