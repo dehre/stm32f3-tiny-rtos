@@ -121,21 +121,19 @@ extern void OSAsm_ThreadSwitch(void);
  */
 void OS_Scheduler(void);
 
-// TODO LORIS: rename to OS_Thread_Suspend
 /**
- * The fn OS_Suspend halts the current thread and switches to the next.
+ * The fn OS_Thread_Suspend halts the current thread and switches to the next.
  * It's called by the running thread itself.
  */
-void OS_Suspend(void);
+void OS_Thread_Suspend(void);
 
-// TODO LORIS: rename to OS_Thread_Sleep
 /**
- * The fn OS_Sleep makes the current thread dormant for a specified time.
+ * The fn OS_Thread_Sleep makes the current thread dormant for a specified time.
  * It's called by the running thread itself.
  * The fn OS_DecrementTCBsSleepDuration is called by the SysTick ISR every ms and decrements the
  * the value of sleep on the TCBs.
  */
-void OS_Sleep(uint32_t ms);
+void OS_Thread_Sleep(uint32_t ms);
 void OS_DecrementTCBsSleepDuration(void);
 
 //==================================================================================================
@@ -244,15 +242,15 @@ void OS_Scheduler(void)
     }
 }
 
-void OS_Suspend(void)
+void OS_Thread_Suspend(void)
 {
     SchedlTimer_ResetCounter();
 }
 
-void OS_Sleep(uint32_t sleep_duration_ms)
+void OS_Thread_Sleep(uint32_t sleep_duration_ms)
 {
     RunPt->sleep = sleep_duration_ms;
-    OS_Suspend();
+    OS_Thread_Suspend();
 }
 
 void OS_DecrementTCBsSleepDuration(void)

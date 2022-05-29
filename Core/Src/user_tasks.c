@@ -54,7 +54,7 @@ void UserTask_1(void)
             InstrumentTriggerPE12_Toggle();
             HAL_Delay(50);
         }
-        OS_Suspend();
+        OS_Thread_Suspend();
     }
 }
 
@@ -67,7 +67,7 @@ void UserTask_2(void)
         InstrumentTriggerPE13_Toggle();
         count++;
         if (count % 35 == 0)
-            OS_Sleep(4500);
+            OS_Thread_Sleep(4500);
         else
             HAL_Delay(70);
     }
