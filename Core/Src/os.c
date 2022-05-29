@@ -8,6 +8,7 @@
 #include "schedl_timer.h"
 
 #include "stm32f3xx_hal.h"
+#include <stdbool.h>
 
 //==================================================================================================
 // DEFINES - MACROS
@@ -18,6 +19,16 @@
 //==================================================================================================
 
 /**
+ * TCBState indicates whether the TCB can be used by OS_ThreadCreate
+ * to create a new thread.
+ */
+typedef enum
+{
+    TCBStateFree,
+    TCBStateActive
+} TCBState_t;
+
+/**
  * Thread Control Block
  *
  * IMPORTANT!
@@ -26,24 +37,40 @@
  */
 typedef struct TCB
 {
-    uint32_t *sp;     /* Stack pointer, valid for threads not running */
-    struct TCB *next; /* Pointer to circular-linked-list of TCBs */
-    uint32_t sleep;   /* Sleep duration in ms, zero means not sleeping */
+    uint32_t *sp;      /* Stack pointer, valid for threads not running */
+    struct TCB *next;  /* Pointer to circular-linked-list of TCBs */
+    uint32_t sleep;    /* Sleep duration in ms, zero means not sleeping */
+    TCBState_t status; /* TCB active or free */
 } TCB_t;
 
 //==================================================================================================
 // GLOBAL AND STATIC VARIABLES
 //==================================================================================================
 
-static TCB_t TCBs[NUMTHREADS];
-static uint32_t Stacks[NUMTHREADS][STACKSIZE];
+static TCB_t TCBs[MAXNUMTHREADS];
+static uint32_t Stacks[MAXNUMTHREADS][STACKSIZE];
 
 /* Pointer to the currently running thread */
 TCB_t *RunPt;
 
+// TODO LORIS: ? remove this variable, and replace it with number of active TCBs?
+/* The flag Thread_FirstCreated indicates whether the first thread has been added
+ * to the circular linked list of TCBs before the OS is launched */
+static bool Thread_FirstCreated = false;
+
 //==================================================================================================
 // FUNCTION PROTOTYPES
 //==================================================================================================
+
+/**
+ * The fn OS_InitTCBsStatus initializes all TCBs' statuses to be free at startup.
+ */
+static void OS_InitTCBsStatus(void);
+
+/**
+ * The fn OS_Init initializes the SchedlTimer and the TCBs.
+ */
+void OS_Init(uint32_t scheduler_frequency_hz);
 
 /**
  * The fn OS_SetInitialStack and OS_AddThreads link together the threads in a circular list and
@@ -51,12 +78,28 @@ TCB_t *RunPt;
  * Check the "STM32 Cortex-M4 Programming Manual" on page 18 for the list of processor core registers.
  */
 static void OS_SetInitialStack(uint32_t tcb_idx);
+// TODO LORIS: remove this fn
 void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void));
 
 /**
- * The fn OS_Init initializes the SchedlTimer.
+ * The fn OS_Thread_CreateFirst establishes the circular linked list of TCBs
+ * with one node, and points RunPt to that node.
+ * The fn must be called before the OS is launched.
  */
-void OS_Init(uint32_t scheduler_frequency_hz);
+void OS_Thread_CreateFirst(void (*task)(void));
+
+/**
+ * The fn OS_Thread_Create adds a new thread to the circular linked list of TCBs, then runs it.
+ * It fails if all the TCBs are already active.
+ *
+ * The fn can be called both:
+ *   - before the OS is launched (but after the first thread is created);
+ *   - after the OS is launched (by a running thread).
+ *
+ * The thread that calls this function keeps running until the end of its scheduled time-slice.
+ * The new thread is run next.
+ */
+void OS_Thread_Create(void (*task)(void));
 
 /**
  * The fn OS_Launch enables the SchedlTimer, then calls OSAsm_Start, which launches the first thread.
@@ -83,12 +126,14 @@ extern void OSAsm_ThreadSwitch(void);
  */
 void OS_Scheduler(void);
 
+// TODO LORIS: rename to OS_Thread_Suspend
 /**
  * The fn OS_Suspend halts the current thread and switches to the next.
  * It's called by the running thread itself.
  */
 void OS_Suspend(void);
 
+// TODO LORIS: rename to OS_Thread_Sleep
 /**
  * The fn OS_Sleep makes the current thread dormant for a specified time.
  * It's called by the running thread itself.
@@ -101,6 +146,20 @@ void OS_DecrementTCBsSleepDuration(void);
 //==================================================================================================
 // IMPLEMENTATION
 //==================================================================================================
+
+static void OS_InitTCBsStatus(void)
+{
+    for (uint32_t idx = 0; idx < MAXNUMTHREADS; idx++)
+    {
+        TCBs[idx].status = TCBStateFree;
+    }
+}
+
+void OS_Init(uint32_t scheduler_frequency_hz)
+{
+    SchedlTimer_Init(scheduler_frequency_hz);
+    OS_InitTCBsStatus();
+}
 
 static void OS_SetInitialStack(uint32_t tcb_idx)
 {
@@ -143,9 +202,45 @@ void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void)
     RunPt = &(TCBs[0]);
 }
 
-void OS_Init(uint32_t scheduler_frequency_hz)
+// TODO LORIS: merge this method with OS_Thread_Create
+void OS_Thread_CreateFirst(void (*task)(void))
 {
-    SchedlTimer_Init(scheduler_frequency_hz);
+    TCBs[0].next = &(TCBs[0]);
+    TCBs[0].sleep = 0;
+    TCBs[0].status = TCBStateActive;
+
+    OS_SetInitialStack(0);                    /* TCBs[0].sp set here */
+    Stacks[0][STACKSIZE - 2] = (int32_t)task; /* PC */
+
+    /* Thread 0 will run first */
+    RunPt = &(TCBs[0]);
+    Thread_FirstCreated = true;
+}
+
+void OS_Thread_Create(void (*task)(void))
+{
+    __disable_irq();
+    uint32_t new_tcb_idx;
+    for (new_tcb_idx = 0; new_tcb_idx < MAXNUMTHREADS; new_tcb_idx++)
+    {
+        if (TCBs[new_tcb_idx].status == TCBStateFree)
+            break;
+    }
+    if (new_tcb_idx == MAXNUMTHREADS)
+    {
+        // TODO LORIS: return enum OS_Error
+        return;
+    }
+
+    TCBs[new_tcb_idx].next = RunPt->next;
+    RunPt->next = &(TCBs[new_tcb_idx]);
+
+    TCBs[new_tcb_idx].sleep = 0;
+    TCBs[new_tcb_idx].status = TCBStateActive;
+
+    OS_SetInitialStack(new_tcb_idx);
+    Stacks[new_tcb_idx][STACKSIZE - 2] = (int32_t)task; /* PC */
+    __enable_irq();
 }
 
 void OS_Launch(void)

@@ -37,8 +37,10 @@ int main(void)
     SystemClock_Config();
 
     /* Set up and start the OS */
-    OS_AddThreads(UserTask_0, UserTask_1, UserTask_2);
     OS_Init(THREADFREQ);
+    OS_Thread_CreateFirst(UserTask_0);
+    OS_Thread_Create(UserTask_1);
+    OS_Thread_Create(UserTask_2);
     OS_Launch();
 
     /* This statement should not be reached */
