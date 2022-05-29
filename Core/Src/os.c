@@ -53,10 +53,8 @@ static uint32_t Stacks[MAXNUMTHREADS][STACKSIZE];
 /* Pointer to the currently running thread */
 TCB_t *RunPt;
 
-// TODO LORIS: ? remove this variable, and replace it with number of active TCBs?
-/* The flag Thread_FirstCreated indicates whether the first thread has been added
- * to the circular linked list of TCBs before the OS is launched */
-static bool Thread_FirstCreated = false;
+/* The variable ActiveTCBsCount tracks the number of TCBs in use by the OS */
+static uint32_t ActiveTCBsCount;
 
 //==================================================================================================
 // FUNCTION PROTOTYPES
@@ -73,18 +71,15 @@ static void OS_InitTCBsStatus(void);
 void OS_Init(uint32_t scheduler_frequency_hz);
 
 /**
- * The fn OS_SetInitialStack and OS_AddThreads link together the threads in a circular list and
- * set up the stack for each of them as if they had already been running and then suspended.
+ * The fn OS_SetInitialStack sets up the thread's stack as if it had already been running and then suspended.
+ * Finally, it sets the TCB's SP (stack pointer) to the top of the stack (grows downwards).
  * Check the "STM32 Cortex-M4 Programming Manual" on page 18 for the list of processor core registers.
  */
 static void OS_SetInitialStack(uint32_t tcb_idx);
-// TODO LORIS: remove this fn
-void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void));
 
 /**
- * The fn OS_Thread_CreateFirst establishes the circular linked list of TCBs
- * with one node, and points RunPt to that node.
- * The fn must be called before the OS is launched.
+ * The fn OS_Thread_CreateFirst establishes the circular linked list of TCBs with one node,
+ * and points RunPt to that node. The fn must be called before the OS is launched.
  */
 void OS_Thread_CreateFirst(void (*task)(void));
 
@@ -185,66 +180,50 @@ static void OS_SetInitialStack(uint32_t tcb_idx)
     TCBs[tcb_idx].sp = &Stacks[tcb_idx][STACKSIZE - 16]; /* Thread's stack pointer */
 }
 
-void OS_AddThreads(void (*task0)(void), void (*task1)(void), void (*task2)(void))
-{
-    TCBs[0].next = &(TCBs[1]);
-    TCBs[1].next = &(TCBs[2]);
-    TCBs[2].next = &(TCBs[0]);
-
-    OS_SetInitialStack(0);
-    Stacks[0][STACKSIZE - 2] = (int32_t)task0; /* PC */
-    OS_SetInitialStack(1);
-    Stacks[1][STACKSIZE - 2] = (int32_t)task1; /* PC */
-    OS_SetInitialStack(2);
-    Stacks[2][STACKSIZE - 2] = (int32_t)task2; /* PC */
-
-    /* Thread 0 will run first */
-    RunPt = &(TCBs[0]);
-}
-
-// TODO LORIS: merge this method with OS_Thread_Create
 void OS_Thread_CreateFirst(void (*task)(void))
 {
+    assert_or_panic(ActiveTCBsCount == 0);
     TCBs[0].next = &(TCBs[0]);
     TCBs[0].sleep = 0;
     TCBs[0].status = TCBStateActive;
 
-    OS_SetInitialStack(0);                    /* TCBs[0].sp set here */
+    OS_SetInitialStack(0);
     Stacks[0][STACKSIZE - 2] = (int32_t)task; /* PC */
 
     /* Thread 0 will run first */
     RunPt = &(TCBs[0]);
-    Thread_FirstCreated = true;
+    ActiveTCBsCount++;
 }
 
 void OS_Thread_Create(void (*task)(void))
 {
+    assert_or_panic(ActiveTCBsCount > 0 && ActiveTCBsCount < MAXNUMTHREADS);
     __disable_irq();
+
+    /* Find next available TCB */
     uint32_t new_tcb_idx;
     for (new_tcb_idx = 0; new_tcb_idx < MAXNUMTHREADS; new_tcb_idx++)
     {
         if (TCBs[new_tcb_idx].status == TCBStateFree)
             break;
     }
-    if (new_tcb_idx == MAXNUMTHREADS)
-    {
-        // TODO LORIS: return enum OS_Error
-        return;
-    }
 
     TCBs[new_tcb_idx].next = RunPt->next;
     RunPt->next = &(TCBs[new_tcb_idx]);
-
     TCBs[new_tcb_idx].sleep = 0;
     TCBs[new_tcb_idx].status = TCBStateActive;
 
     OS_SetInitialStack(new_tcb_idx);
     Stacks[new_tcb_idx][STACKSIZE - 2] = (int32_t)task; /* PC */
+
+    ActiveTCBsCount++;
     __enable_irq();
 }
 
 void OS_Launch(void)
 {
+    assert_or_panic(ActiveTCBsCount > 0);
+
     /* Prevent the timer's ISR from firing before OSAsm_Start is called */
     __disable_irq();
 
@@ -278,7 +257,7 @@ void OS_Sleep(uint32_t sleep_duration_ms)
 
 void OS_DecrementTCBsSleepDuration(void)
 {
-    for (size_t tcb_idx = 0; tcb_idx < NUMTHREADS; tcb_idx++)
+    for (size_t tcb_idx = 0; tcb_idx < MAXNUMTHREADS; tcb_idx++)
     {
         if (TCBs[tcb_idx].sleep > 0)
         {
