@@ -8,7 +8,6 @@
 #include "schedl_timer.h"
 
 #include "stm32f3xx_hal.h"
-#include <stdbool.h>
 
 //==================================================================================================
 // DEFINES - MACROS
@@ -37,10 +36,11 @@ typedef enum
  */
 typedef struct TCB
 {
-    uint32_t *sp;      /* Stack pointer, valid for threads not running */
-    struct TCB *next;  /* Pointer to circular-linked-list of TCBs */
-    uint32_t sleep;    /* Sleep duration in ms, zero means not sleeping */
-    TCBState_t status; /* TCB active or free */
+    uint32_t *sp;         /* Stack pointer, valid for threads not running */
+    struct TCB *next;     /* Pointer to circular-linked-list of TCBs */
+    uint32_t sleep;       /* Sleep duration in ms, zero means not sleeping */
+    TCBState_t status;    /* TCB active or free */
+    Semaphore_t *blocked; /* Pointer to semaphore on which the thread is blocked, NULL if not blocked */
 } TCB_t;
 
 //==================================================================================================
@@ -142,6 +142,19 @@ void OS_DecrementTCBsSleepDuration(void);
  */
 void OS_Thread_Kill(void);
 
+/**
+ * The fn OS_Semaphore_Wait decrements the semaphore counter.
+ * If the new counter's value is < 0, it marks the current thread as blocked and switches
+ * to the next one.
+ */
+void OS_Semaphore_Wait(Semaphore_t *sem);
+
+/**
+ * The fn OS_Semaphore_Signal increments the semaphore counter.
+ * If the new counter's value is <= 0, it wakes up the next thread blocked on that semaphore.
+ */
+void OS_Semaphore_Signal(Semaphore_t *sem);
+
 //==================================================================================================
 // IMPLEMENTATION
 //==================================================================================================
@@ -190,6 +203,7 @@ void OS_Thread_CreateFirst(void (*task)(void))
     TCBs[0].next = &(TCBs[0]);
     TCBs[0].sleep = 0;
     TCBs[0].status = TCBStateActive;
+    TCBs[0].blocked = NULL;
 
     OS_SetInitialStack(0);
     Stacks[0][STACKSIZE - 2] = (int32_t)task; /* PC */
@@ -216,6 +230,7 @@ void OS_Thread_Create(void (*task)(void))
     RunPt->next = &(TCBs[new_tcb_idx]);
     TCBs[new_tcb_idx].sleep = 0;
     TCBs[new_tcb_idx].status = TCBStateActive;
+    TCBs[new_tcb_idx].blocked = NULL;
 
     OS_SetInitialStack(new_tcb_idx);
     Stacks[new_tcb_idx][STACKSIZE - 2] = (int32_t)task; /* PC */
@@ -290,4 +305,34 @@ void OS_Thread_Kill(void)
     ActiveTCBsCount--;
     __enable_irq();
     OS_Thread_Suspend();
+}
+
+void OS_Semaphore_Wait(Semaphore_t *sem)
+{
+    __disable_irq();
+    (*sem) = (*sem) - 1;
+    if ((*sem) < 0)
+    {
+        RunPt->blocked = sem; /* Reason the thread is blocked */
+        __enable_irq();
+        OS_Thread_Suspend();
+    }
+    __enable_irq();
+}
+
+void OS_Semaphore_Signal(Semaphore_t *sem)
+{
+    __disable_irq();
+    (*sem) = (*sem) + 1;
+    if ((*sem) <= 0)
+    {
+        /* Search for a TCB blocked on this semaphore and wake it up */
+        TCB_t *a_tcb = RunPt->next;
+        while (a_tcb->blocked != sem)
+        {
+            a_tcb = a_tcb->next;
+        }
+        a_tcb->blocked = 0;
+    }
+    __enable_irq();
 }
