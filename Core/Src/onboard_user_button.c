@@ -2,17 +2,18 @@
 // INCLUDES
 //==================================================================================================
 
-#include "schedl_timer.h"
+#include "onboard_user_button.h"
 
-#include "iferr.h"
 #include "instrument_trigger.h"
+#include "os.h"
+
+#include "stm32f3xx_hal.h"
 
 //==================================================================================================
 // DEFINES - MACROS
 //==================================================================================================
 
-/* The pin PB0 is used for monitoring the interval between context-switches with the logic analyzer */
-InstrumentTrigger_Create(B, 0);
+InstrumentTrigger_Create(E, 8);
 
 //==================================================================================================
 // ENUMS - STRUCTS - TYPEDEFS
@@ -22,51 +23,56 @@ InstrumentTrigger_Create(B, 0);
 // STATIC PROTOTYPES
 //==================================================================================================
 
+static void OnTouch(void);
+
 //==================================================================================================
 // STATIC VARIABLES
 //==================================================================================================
 
-static TIM_HandleTypeDef TIMHandle;
+static Semaphore_t SemaphoreButtonPressed = 0;
 
 //==================================================================================================
 // GLOBAL FUNCTIONS
 //==================================================================================================
 
-void SchedlTimer_Init(uint32_t reload_frequency_hz)
+void OnboardUserButton_Init(void)
 {
-    // TODO LORIS: increase number of prescaler divisions, so that max_frequency > 500
-    // TODO LORIS: ? compute period at the beginning, so that it's easy too see why it fails with assert_or_panic
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_NVIC_SetPriority(EXTI0_IRQn, 0x0F, 0); /* Minimum pre-emption priority */
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-    /* Compute the prescaler value to have TIM2 counter clock equal to 1 KHz */
-    uint32_t prescaler_divisions = 1000;
-    TIMHandle.Instance = SchedlTimer_Instance;
-    TIMHandle.Init.Prescaler = (SystemCoreClock / prescaler_divisions) - 1;
-    TIMHandle.Init.Period = (prescaler_divisions / reload_frequency_hz) - 1;
-    TIMHandle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    TIMHandle.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-    assert_or_panic(TIMHandle.Init.Period > 0);
-    IFERR_PANIC(HAL_TIM_Base_Init(&TIMHandle));
-    InstrumentTriggerPB0_Init();
+    InstrumentTriggerPE8_Init();
 }
 
-void SchedlTimer_Start(void)
+void OnboardUserButton_IRQHandler(void)
 {
-    IFERR_PANIC(HAL_TIM_Base_Start_IT(&TIMHandle));
+    __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);
+    HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+    OS_Semaphore_Signal(&SemaphoreButtonPressed);
 }
 
-void SchedlTimer_ClearITFlag(void)
+void OnboardUserButton_Task(void)
 {
-    __HAL_TIM_CLEAR_IT(&TIMHandle, TIM_IT_UPDATE);
-    InstrumentTriggerPB0_Toggle();
-}
-
-void SchedlTimer_ResetCounter(void)
-{
-    __HAL_TIM_SET_COUNTER(&TIMHandle, 0);
-    /* Don't return from this fn before the interrupt triggered */
-    HAL_Delay(1);
+    while (1)
+    {
+        OS_Semaphore_Wait(&SemaphoreButtonPressed);
+        OnTouch();
+        HAL_Delay(10);
+        HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+    }
 }
 
 //==================================================================================================
 // STATIC FUNCTIONS
 //==================================================================================================
+
+static void OnTouch(void)
+{
+    InstrumentTriggerPE8_Toggle();
+}

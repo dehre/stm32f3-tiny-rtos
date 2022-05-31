@@ -66,3 +66,8 @@ void SysTick_Handler(void);
  * The implementation is in os_asm.s
  */
 void SchedlTimer_IRQHandler(void);
+
+/**
+ * The function EXTI0_IRQHandler handles EXTI interrupts from Line 0.
+ */
+void EXTI0_IRQHandler(void);

@@ -4,6 +4,7 @@
 
 #include "stm32f3xx_it.h"
 
+#include "onboard_user_button.h"
 #include "os.h"
 
 #include "core_cm4.h"
@@ -130,6 +131,11 @@ void SysTick_Handler(void)
 // For the available peripheral interrupt handler names,
 // please refer to the startup file (startup_stm32f3xx.s).
 //==================================================================================================
+
+void EXTI0_IRQHandler(void)
+{
+    OnboardUserButton_IRQHandler();
+}
 
 //==================================================================================================
 // STATIC FUNCTIONS

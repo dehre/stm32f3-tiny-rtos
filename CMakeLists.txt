@@ -39,6 +39,7 @@ set(EXECUTABLE                      ${CMAKE_PROJECT_NAME})
 #
 set(src_core_src_SRCS 
     ${PROJ_PATH}/Core/Src/main.c
+    ${PROJ_PATH}/Core/Src/onboard_user_button.c
     ${PROJ_PATH}/Core/Src/os.c
     ${PROJ_PATH}/Core/Src/os_asm.s
     ${PROJ_PATH}/Core/Src/schedl_timer.c

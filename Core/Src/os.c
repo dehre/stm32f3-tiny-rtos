@@ -255,9 +255,11 @@ void OS_Launch(void)
 
 void OS_Scheduler(void)
 {
-    RunPt = RunPt->next;
-    /* Skip sleeping threads; this implementation crashes if all threads are sleeping */
-    while ((RunPt->sleep) > 0)
+    RunPt = RunPt->next; /* Round Robin */
+
+    /* Skip sleeping and blocked threads;
+     * This implementation crashes if all threads are sleeping or blocking */
+    while (RunPt->sleep > 0 || RunPt->blocked != NULL)
     {
         RunPt = RunPt->next;
     }

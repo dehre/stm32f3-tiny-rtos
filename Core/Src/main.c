@@ -3,6 +3,7 @@
 //==================================================================================================
 
 #include "iferr.h"
+#include "onboard_user_button.h"
 #include "os.h"
 #include "user_tasks.h"
 
@@ -35,12 +36,14 @@ int main(void)
     /* Reset all peripherals, initialize the Systick, configure the system clock */
     IFERR_PANIC(HAL_Init());
     SystemClock_Config();
+    OnboardUserButton_Init();
 
     /* Set up and start the OS */
     OS_Init(THREADFREQ);
     OS_Thread_CreateFirst(UserTask_0);
     OS_Thread_Create(UserTask_1);
     OS_Thread_Create(UserTask_2);
+    OS_Thread_Create(OnboardUserButton_Task);
     OS_Launch();
 
     /* This statement should not be reached */
