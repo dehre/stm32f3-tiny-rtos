@@ -38,6 +38,7 @@ set(EXECUTABLE                      ${CMAKE_PROJECT_NAME})
 # Source files
 #
 set(src_core_src_SRCS 
+    ${PROJ_PATH}/Core/Src/fifo_queue.c
     ${PROJ_PATH}/Core/Src/main.c
     ${PROJ_PATH}/Core/Src/onboard_user_button.c
     ${PROJ_PATH}/Core/Src/os.c
