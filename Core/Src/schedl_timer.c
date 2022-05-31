@@ -34,17 +34,16 @@ static TIM_HandleTypeDef TIMHandle;
 
 void SchedlTimer_Init(uint32_t reload_frequency_hz)
 {
-    // TODO LORIS: increase number of prescaler divisions, so that max_frequency > 500
-    // TODO LORIS: ? compute period at the beginning, so that it's easy too see why it fails with assert_or_panic
-
     /* Compute the prescaler value to have TIM2 counter clock equal to 1 KHz */
-    uint32_t prescaler_divisions = 1000;
+    uint32_t prescaler_divisions = 10000;
+    uint32_t period = prescaler_divisions / reload_frequency_hz;
+    assert_or_panic(period > 1);
+
     TIMHandle.Instance = SchedlTimer_Instance;
-    TIMHandle.Init.Prescaler = (SystemCoreClock / prescaler_divisions) - 1;
-    TIMHandle.Init.Period = (prescaler_divisions / reload_frequency_hz) - 1;
+    TIMHandle.Init.Prescaler = (SystemCoreClock / prescaler_divisions) - 1; /* Off by 1 because it’s 0-based */
+    TIMHandle.Init.Period = period - 1;                                     /* Off by 1 because it’s 0-based */
     TIMHandle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     TIMHandle.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-    assert_or_panic(TIMHandle.Init.Period > 0);
     IFERR_PANIC(HAL_TIM_Base_Init(&TIMHandle));
     InstrumentTriggerPB0_Init();
 }

@@ -46,7 +46,6 @@ void OnboardUserButton_Init(void)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     HAL_NVIC_SetPriority(EXTI0_IRQn, 0x0F, 0); /* Minimum pre-emption priority */
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
     InstrumentTriggerPE8_Init();
 }
 
