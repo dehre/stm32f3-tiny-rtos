@@ -42,6 +42,7 @@ typedef struct TCB
     TCBState_t status;    /* TCB active or free */
     Semaphore_t *blocked; /* Pointer to semaphore on which the thread is blocked, NULL if not blocked */
     uint8_t priority;     /* Thread priority, 0 is highest, 255 is lowest */
+    const char *name;     /* Descriptive name to facilitate debugging */
 } TCB_t;
 
 //==================================================================================================
@@ -82,7 +83,7 @@ static void OS_SetInitialStack(uint32_t tcb_idx);
  * The fn OS_Thread_CreateFirst establishes the circular linked list of TCBs with one node,
  * and points RunPt to that node. The fn must be called before the OS is launched.
  */
-void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority);
+void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority, const char *name);
 
 /**
  * The fn OS_Thread_Create adds a new thread to the circular linked list of TCBs, then runs it.
@@ -95,7 +96,7 @@ void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority);
  * The thread that calls this function keeps running until the end of its scheduled time-slice.
  * The new thread is run next.
  */
-void OS_Thread_Create(void (*task)(void), uint8_t priority);
+void OS_Thread_Create(void (*task)(void), uint8_t priority, const char *name);
 
 /**
  * The fn OS_Launch enables the SchedlTimer, then calls OSAsm_Start, which launches the first thread.
@@ -198,7 +199,7 @@ static void OS_SetInitialStack(uint32_t tcb_idx)
     TCBs[tcb_idx].sp = &Stacks[tcb_idx][STACKSIZE - 16]; /* Thread's stack pointer */
 }
 
-void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority)
+void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority, const char *name)
 {
     assert_or_panic(ActiveTCBsCount == 0);
     TCBs[0].next = &(TCBs[0]);
@@ -206,6 +207,7 @@ void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority)
     TCBs[0].status = TCBStateActive;
     TCBs[0].blocked = NULL;
     TCBs[0].priority = priority;
+    TCBs[0].name = name;
 
     OS_SetInitialStack(0);
     Stacks[0][STACKSIZE - 2] = (int32_t)task; /* PC */
@@ -215,7 +217,7 @@ void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority)
     ActiveTCBsCount++;
 }
 
-void OS_Thread_Create(void (*task)(void), uint8_t priority)
+void OS_Thread_Create(void (*task)(void), uint8_t priority, const char *name)
 {
     assert_or_panic(ActiveTCBsCount > 0 && ActiveTCBsCount < MAXNUMTHREADS);
     __disable_irq();
@@ -234,6 +236,7 @@ void OS_Thread_Create(void (*task)(void), uint8_t priority)
     TCBs[new_tcb_idx].status = TCBStateActive;
     TCBs[new_tcb_idx].blocked = NULL;
     TCBs[new_tcb_idx].priority = priority;
+    TCBs[new_tcb_idx].name = name;
 
     OS_SetInitialStack(new_tcb_idx);
     Stacks[new_tcb_idx][STACKSIZE - 2] = (int32_t)task; /* PC */

@@ -40,10 +40,10 @@ int main(void)
 
     /* Set up and start the OS */
     OS_Init(THREADFREQ);
-    OS_Thread_CreateFirst(UserTask_0, OS_SCHEDL_PRIO_MAIN_THREAD);
-    OS_Thread_Create(UserTask_1, OS_SCHEDL_PRIO_MAIN_THREAD);
-    OS_Thread_Create(UserTask_2, OS_SCHEDL_PRIO_MAIN_THREAD);
-    OS_Thread_Create(OnboardUserButton_Task, OS_SCHEDL_PRIO_EVENT_THREAD);
+    OS_Thread_CreateFirst(UserTask_0, OS_SCHEDL_PRIO_MAIN_THREAD, "UserTask_0");
+    OS_Thread_Create(UserTask_1, OS_SCHEDL_PRIO_MAIN_THREAD, "UserTask_1");
+    OS_Thread_Create(UserTask_2, OS_SCHEDL_PRIO_MAIN_THREAD, "UserTask_2");
+    OS_Thread_Create(OnboardUserButton_Task, OS_SCHEDL_PRIO_EVENT_THREAD, "OnboardUserButton_Task");
     OS_Launch();
 
     /* This statement should not be reached */

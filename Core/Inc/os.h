@@ -29,9 +29,9 @@ typedef int32_t Semaphore_t;
 
 void OS_Init(uint32_t scheduler_frequency_hz);
 
-void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority);
+void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority, const char *name);
 
-void OS_Thread_Create(void (*task)(void), uint8_t priority);
+void OS_Thread_Create(void (*task)(void), uint8_t priority, const char *name);
 
 void OS_Launch(void);
 

@@ -25,6 +25,9 @@
  * _main.c_
  * ```c
  * #include "onboard_user_button.h"
+ * 
+ * #define TASK_PRIORITY 100
+ * #define TASK_NAME "OnboardUserButton_Task"
  *
  * int main(void)
  * {
@@ -34,7 +37,7 @@
  *     OnboardUserButton_Init();
  *
  *     OS_Init(500);
- *     OS_Thread_CreateFirst(OnboardUserButton_Task);
+ *     OS_Thread_CreateFirst(OnboardUserButton_Task, TASK_PRIORITY, TASK_NAME);
  *     OS_Launch();
  * }
  * ```
