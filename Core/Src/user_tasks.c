@@ -47,7 +47,7 @@ void UserTask_0(void)
         count++;
         if (count == 100)
         {
-            OS_Thread_Create(UserTask_3);
+            OS_Thread_Create(UserTask_3, OS_SCHEDL_PRIO_MAIN_THREAD);
         }
         if (count == 200)
         {

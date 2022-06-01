@@ -41,6 +41,7 @@ typedef struct TCB
     uint32_t sleep;       /* Sleep duration in ms, zero means not sleeping */
     TCBState_t status;    /* TCB active or free */
     Semaphore_t *blocked; /* Pointer to semaphore on which the thread is blocked, NULL if not blocked */
+    uint8_t priority;     /* Thread priority, 0 is highest, 255 is lowest */
 } TCB_t;
 
 //==================================================================================================
@@ -81,7 +82,7 @@ static void OS_SetInitialStack(uint32_t tcb_idx);
  * The fn OS_Thread_CreateFirst establishes the circular linked list of TCBs with one node,
  * and points RunPt to that node. The fn must be called before the OS is launched.
  */
-void OS_Thread_CreateFirst(void (*task)(void));
+void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority);
 
 /**
  * The fn OS_Thread_Create adds a new thread to the circular linked list of TCBs, then runs it.
@@ -94,7 +95,7 @@ void OS_Thread_CreateFirst(void (*task)(void));
  * The thread that calls this function keeps running until the end of its scheduled time-slice.
  * The new thread is run next.
  */
-void OS_Thread_Create(void (*task)(void));
+void OS_Thread_Create(void (*task)(void), uint8_t priority);
 
 /**
  * The fn OS_Launch enables the SchedlTimer, then calls OSAsm_Start, which launches the first thread.
@@ -197,13 +198,14 @@ static void OS_SetInitialStack(uint32_t tcb_idx)
     TCBs[tcb_idx].sp = &Stacks[tcb_idx][STACKSIZE - 16]; /* Thread's stack pointer */
 }
 
-void OS_Thread_CreateFirst(void (*task)(void))
+void OS_Thread_CreateFirst(void (*task)(void), uint8_t priority)
 {
     assert_or_panic(ActiveTCBsCount == 0);
     TCBs[0].next = &(TCBs[0]);
     TCBs[0].sleep = 0;
     TCBs[0].status = TCBStateActive;
     TCBs[0].blocked = NULL;
+    TCBs[0].priority = priority;
 
     OS_SetInitialStack(0);
     Stacks[0][STACKSIZE - 2] = (int32_t)task; /* PC */
@@ -213,7 +215,7 @@ void OS_Thread_CreateFirst(void (*task)(void))
     ActiveTCBsCount++;
 }
 
-void OS_Thread_Create(void (*task)(void))
+void OS_Thread_Create(void (*task)(void), uint8_t priority)
 {
     assert_or_panic(ActiveTCBsCount > 0 && ActiveTCBsCount < MAXNUMTHREADS);
     __disable_irq();
@@ -231,6 +233,7 @@ void OS_Thread_Create(void (*task)(void))
     TCBs[new_tcb_idx].sleep = 0;
     TCBs[new_tcb_idx].status = TCBStateActive;
     TCBs[new_tcb_idx].blocked = NULL;
+    TCBs[new_tcb_idx].priority = priority;
 
     OS_SetInitialStack(new_tcb_idx);
     Stacks[new_tcb_idx][STACKSIZE - 2] = (int32_t)task; /* PC */
@@ -255,14 +258,25 @@ void OS_Launch(void)
 
 void OS_Scheduler(void)
 {
-    RunPt = RunPt->next; /* Round Robin */
+    /* If this fn has been invoked by OS_Thread_Kill, the current TCB has been removed from the
+     * linked list, so it's correct to start iterating from the next TCB */
+    TCB_t *next_pt = RunPt->next;
+    TCB_t *iterating_pt = next_pt;
 
-    /* Skip sleeping and blocked threads;
-     * This implementation crashes if all threads are sleeping or blocking */
-    while (RunPt->sleep > 0 || RunPt->blocked != NULL)
+    /* Search for highest priority thread not sleeping or blocked */
+    uint32_t max_priority = UINT8_MAX + 1;
+    TCB_t *best_pt = next_pt;
+    do
     {
-        RunPt = RunPt->next;
-    }
+        if ((iterating_pt->priority < max_priority) && (iterating_pt->sleep == 0) && (iterating_pt->blocked == NULL))
+        {
+            best_pt = iterating_pt;
+            max_priority = best_pt->priority;
+        }
+        iterating_pt = iterating_pt->next;
+    } while (iterating_pt != next_pt);
+
+    RunPt = best_pt;
 }
 
 void OS_Thread_Suspend(void)
