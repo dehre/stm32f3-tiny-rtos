@@ -68,21 +68,19 @@ set(src_core_startup_SRCS
     ${PROJ_PATH}/Core/Startup/startup_stm32f303vctx.s)
 
 set(src_drivers_stm32f3xx_hal_driver_src_SRCS 
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c
     ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c
+    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
     ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
+    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_exti.c
+    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c
+    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c
+    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c
     ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c
     ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
     ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c
     ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim_ex.c
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c
     ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim.c
-    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c)
+    ${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim_ex.c)
 
 # Include directories
 set(include_c_DIRS
