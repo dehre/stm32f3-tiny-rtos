@@ -685,7 +685,7 @@ Here's the result:
 
 **Remark:**  
 If you want to inspect the logic analyzer session yourself, [install Logic2 from Saleae](https://www.saleae.com/downloads/)
-and open the file [`readme_assets/saleae-logic2-session.sal`](https://github.com/dehre/stm32f3-tiny-rtos/tree/main/readme_assets/saleae-logic2-session.sal).
+and open the file [`readme_assets/saleae-logic2-session.sal`](https://github.com/dehre/stm32f3-tiny-rtos/blob/main/readme_assets/saleae-logic2-session.sal).
 
 ## Added Features on top of the barebone-os
 
