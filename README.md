@@ -12,7 +12,7 @@ like for the STM32F3 Series, those MCUs are based on [32-bit ARM Cortex-M4](http
 
 To be more specific, this RTOS has been developed on the [STM32F3DISCOVERY](https://www.st.com/en/evaluation-tools/stm32f3discovery.html) board, so you may want to verify the peripherals and GPIO pins used if you want to run it on a different board.
 
-There are of course some differences between what's been presented in the book and what's been developed here:  
+There are of course some differences between what's been presented in the book and what's been developed here:
 first, different boards feature different peripherals, and different manifacturers provide different
 libraries to interface with them, and second, different coding styles led to different outcomes.  
 Nonetheless, if you pick up the book, I'm sure you can follow along quite easily 📚
@@ -38,6 +38,7 @@ Last but not least, if this README taught you something new, consider gifting it
 - [Inspecting the RTOS with the Logic Analyzer](#inspecting-the-rtos-with-the-logic-analyzer)
 - [Added Features on top of the barebone-os](#added-features-on-top-of-the-barebone-os)
 - [Features Missing](#features-missing)
+- [Discussion on Reddit](#discussion-on-reddit)
 - [Diving Into the Project - Naming Convention](#diving-into-the-project---naming-convention)
 - [Diving Into the Project - Error Handling](#diving-into-the-project---error-handling)
 - [Diving Into the Project - The InstrumentTrigger Macro](#diving-into-the-project---the-instrumenttrigger-macro)
@@ -727,6 +728,11 @@ Perhaps the most relevant are:
     like most other RTOSes, tasks don't have their own address space.
     Quoting from this [post](https://www.freertos.org/FreeRTOS_Support_Forum_Archive/November_2016/freertos_Free_RTOS_Memory_Management_59ed41adj.html):
     > As far as I know, NO, FreeRTOS does not deal with ‘virtual’ spaces/memory. In part, because virtual memory is the enemy of Real-Time (the Linux Real Time extensions as far as I know just lock the real-time parts into memory), the problem is that paging in virtual memory adds significant unpredictability to timing.
+    
+## Discussion on Reddit
+
+This project received [a lot of relevant and well-written feedback on Reddit](https://www.reddit.com/r/embedded/comments/voxdj4/a_tiny_rtos_simply_explained), which adds great value to this README.  
+If you've read this far, consider checking it out too.
 
 ## Diving Into the Project - Naming Convention
 
